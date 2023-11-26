@@ -1,0 +1,148 @@
+/* styles.css */
+
+body {
+    font-family: 'Comfortaa', cursive;
+    margin: 0;
+    padding: 0;
+    background-color: #E4EDDB;
+}
+
+.header {
+    display: flex;
+    justify-content: space-around;
+    background-color: #307672;
+    color: #E4EDDB;
+    padding: 15px;
+    text-align: center;
+    align-items: center;
+}
+
+.description {
+    padding: 20px;
+    text-align: center;
+}
+
+.group-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    margin: 20px 0;
+}
+
+.group-link {
+    text-decoration: none;
+    color: #E4EDDB;
+}
+
+.group-item {
+    background-color: #307672;
+    padding: 15px;
+    border-radius: 8px;
+    text-align: center;
+    transition: 0.4s;
+}
+
+.group-item:hover {
+    background-color: #1A3C40;
+    border-radius: 15px;
+    transition: 0.4s;
+}
+
+.group-item img {
+    width: 100%;
+    max-height: 150px;
+    object-fit: cover;
+    border-radius: 5px;
+}
+
+.group-info {
+    max-width: 500px;
+    margin: 15px auto;
+    background-color: #E4EDDB;
+    text-align: center;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.group-block img {
+    max-width: 225px;
+    max-height: 150px;
+    object-fit: cover;
+    border-radius: 5px;
+    margin: 20px 0;
+}
+
+.group-block {
+    display: flex;
+    justify-content: space-around;
+}
+
+.group-info ul {
+    list-style-type: none;
+    padding: 0;
+}
+
+.group-info ul li {
+    margin-bottom: 10px;
+}
+
+.buttons {
+    display: flex;
+    margin: 0 auto;
+}
+
+.back {
+    display: block;
+    margin: 20px auto;
+    color: #E4EDDB;
+    text-decoration: none;
+    font-weight: bold;
+    background-color: #307672;
+    padding: 10px 15px;
+    border-radius: 8px;
+    text-align: center;
+    transition: 0.3s;
+}
+
+.back:hover {
+    background-color: #1A3C40;
+    transition: 0.3s;
+}
+
+
+.form {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #E4EDDB;
+    border-radius: 10px;
+    padding-left: 20px;
+}
+
+.input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: 10px;
+}
+
+.button {
+    border: none;
+    outline: none;
+    padding: 10px 25px;
+    background: #307672;
+    color: #E4EDDB;
+    font-size: 16px;
+    cursor: pointer;
+    border-radius: 10px;
+    border: solid;
+    transition: 0.3s;
+}
+
+.button:hover {
+    background: #1A3C40;
+    border-radius: 20px;
+    transition: 0.3s;
+}

@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Group</title>
+    <link rel="icon" type="image/x-icon" href="/images/icons8-звезда-96.png">
+    <link rel="stylesheet" type="text/css" href="/css/index.css">
+</head>
+
+<body>
+    <div class="header">
+        Обратная связь по курсу
+    </div>
+    <div class="group-info">
+        <div class="group-block">
+            <img src="{{ .Src }}" alt="{{ .Name }}">
+            <div class="info-about">
+                <h2>{{ .Name }}</h2>
+                <p>Курс: {{ .Course }}</p>
+                <p>Контакты: {{ .Contacts }}</p>
+                <p>Количество студентов: {{ len .Students }}</p>
+            </div>
+        </div>
+        <h3>Список студентов:</h3>
+        <ul>
+            {{ range .Students }}
+            <li>{{ .Name }} - {{ .Post }}</li>
+            {{ end }}
+        </ul>
+        <div class="buttons">
+            <a href="/" class="back">Вернуться на главную</a>
+            <a class="back">Запросить обратную связь</a>
+        </div>
+    </div>
+</body>
+
+</html>
