@@ -13,7 +13,8 @@
     <div class="header">
         <a href="/" class="group-link">Обратная связь по курсу</a>
         <form action="/search" method="GET" class="form">
-            <input type="text" id="searchQuery" name="q" class="input" required placeholder="Введите группу">
+            <input type="text" id="searchQuery" name="groupSearch" class="input" required placeholder="Введите группу"
+                value="{{ .searchQuery }}">
             <button type="submit" class="button">Искать</button>
         </form>
     </div>

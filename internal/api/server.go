@@ -55,7 +55,7 @@ func StartServer() {
 	})
 
 	r.GET("/search", func(c *gin.Context) {
-		searchQuery := c.DefaultQuery("q", "")
+		searchQuery := c.DefaultQuery("groupSearch", "")
 		var foundGroups []Group
 		for _, group := range groups {
 			if strings.HasPrefix(strings.ToLower(group.Name), strings.ToLower(searchQuery)) {
@@ -63,11 +63,12 @@ func StartServer() {
 			}
 		}
 		data := gin.H{
-			"groups": foundGroups,
+			"groups":      foundGroups,
+			"searchQuery": searchQuery,
 		}
 		c.HTML(http.StatusOK, "mainPage.tmpl", data)
 	})
-	
+
 	r.Run()
 	// go run cmd/main.go
 

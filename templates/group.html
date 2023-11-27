@@ -20,15 +20,9 @@
                 <h2>{{ .Name }}</h2>
                 <p>Курс: {{ .Course }}</p>
                 <p>Контакты: {{ .Contacts }}</p>
-                <p>Количество студентов: {{ len .Students }}</p>
+                <p>Количество студентов: {{ .Students }}</p>
             </div>
         </div>
-        <h3>Список студентов:</h3>
-        <ul>
-            {{ range .Students }}
-            <li>{{ .Name }} - {{ .Post }}</li>
-            {{ end }}
-        </ul>
         <div class="buttons">
             <a href="/" class="back">Вернуться на главную</a>
             <a class="back">Запросить обратную связь</a>

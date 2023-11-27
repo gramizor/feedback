@@ -8,10 +8,5 @@ type Group struct {
 	Subjects string
 	Src      string
 	Href     string
-	Students []Student
-}
-
-type Student struct {
-	Name string
-	Post string
+	Students int
 }
