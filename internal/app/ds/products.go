@@ -1,6 +1,10 @@
 package ds
 
-import "time"
+import (
+	"time"
+
+	"gorm.io/gorm"
+)
 
 type Group struct {
 	Id       uint `gorm:"primarykey"`
@@ -20,10 +24,12 @@ type Request struct {
 	CreationDate   time.Time
 	FormationDate  time.Time
 	CompletionDate time.Time
+	CreatorID      uint  `gorm:"index"`
+	ModeratorID    uint  `gorm:"index"`
+	GroupID        uint  `gorm:"index"`
 	Creator        User  `gorm:"foreignKey:CreatorID"`
 	Moderator      User  `gorm:"foreignKey:ModeratorID"`
-	GroupID        uint  `gorm:"index"`
-	Groups         Group `gorm:"many2many:group_request"`
+	Group          Group `gorm:"foreignKey:GroupID"`
 }
 
 type User struct {
@@ -33,4 +39,11 @@ type User struct {
 	Role      string
 	Requests  []Request `gorm:"foreignKey:CreatorID;references:Id"`
 	Moderates []Request `gorm:"foreignKey:ModeratorID;references:Id"`
+}
+
+func (group *Group) BeforeCreate(tx *gorm.DB) (err error) {
+	if group.Status == "" {
+		group.Status = "active" // Задайте значение по умолчанию, например, "active"
+	}
+	return nil
 }

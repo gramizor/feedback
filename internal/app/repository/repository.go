@@ -22,10 +22,18 @@ func New(dsn string) (*Repository, error) {
 	}, nil
 }
 
+func (r *Repository) Migrate() error {
+	// Вызываем AutoMigrate для создания таблиц
+	if err := r.db.AutoMigrate(&ds.Group{}, &ds.Request{}, &ds.User{}); err != nil {
+		return err
+	}
+	return nil
+}
+
 func (r *Repository) GetActiveGroups() (*[]ds.Group, error) {
 	var groups []ds.Group
 
-	if err := r.db.Where("is_active = ?", true).Find(&groups).Error; err != nil {
+	if err := r.db.Where("status = ?", "active").Find(&groups).Error; err != nil {
 		return nil, err
 	}
 	return &groups, nil
@@ -40,7 +48,7 @@ func (r *Repository) GetActiveGroupById(id int) (*ds.Group, error) {
 }
 
 func (r *Repository) DeactivateGroupByID(id int) error {
-	if err := r.db.Exec("UPDATE groups SET is_active=false WHERE id= ?", id).Error; err != nil {
+	if err := r.db.Exec("UPDATE groups SET status='deleted' WHERE id= ?", id).Error; err != nil {
 		return err
 	}
 	return nil

@@ -1,5 +1,5 @@
 .group-info {
-    max-width: 500px;
+    max-width: 700px;
     margin: 15px auto;
     background-color: #E4EDDB;
     text-align: center;
@@ -45,9 +45,16 @@
     border-radius: 8px;
     text-align: center;
     transition: 0.3s;
+    cursor: pointer;
+    border: none;
 }
 
 .back:hover {
     background-color: #1A3C40;
     transition: 0.3s;
+}
+
+.delete-form{
+    max-width: 150px;
+    margin: 0 10px;
 }

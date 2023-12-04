@@ -7,22 +7,23 @@
     <title>Group</title>
     <link rel="icon" type="image/x-icon" href="/images/icons8-звезда-96.png">
     <link rel="stylesheet" type="text/css" href="/css/group.css">
+    <link rel="stylesheet" type="text/css" href="/css/index.css">
 </head>
 
 <body>
     <div class="header">
-        Обратная связь по курсу
+        <a href="/" class="group-link">Обратная связь по курсу</a>
     </div>
     <div class="group-info">
         <div class="group-block">
-            <img src="{{ .Src }}" alt="{{ .Name }}">
+            <img src="{{ .Image }}" alt="{{ .Name }}">
             <div class="info-about">
                 <h2>{{ .Name }}</h2>
                 <p>Курс: {{ .Course }}</p>
                 <p>Контакты: {{ .Contacts }}</p>
                 <p>Количество студентов: {{ .Students }}</p>
             </div>
-            <form action="/delete?delete={{.Id}}" method="POST" class="form">
+            <form action="/delete?delete={{.Id}}" method="POST" class="delete-button">
                 <button type="submit" class="button">Удалить группу</button>
             </form>
         </div>
