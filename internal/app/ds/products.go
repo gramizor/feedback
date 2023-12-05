@@ -43,7 +43,7 @@ type User struct {
 
 func (group *Group) BeforeCreate(tx *gorm.DB) (err error) {
 	if group.Status == "" {
-		group.Status = "active" // Задайте значение по умолчанию, например, "active"
+		group.Status = "active"
 	}
 	return nil
 }
