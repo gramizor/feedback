@@ -37,7 +37,7 @@ func (app *Application) Run() {
 	// Группа запросов для доставки
 	FeedbackGroup := r.Group("/feedback")
 	{
-		FeedbackGroup.GET("/", app.Handler.GetDeliveries)
+		FeedbackGroup.GET("/", app.Handler.GetFeedbacks)
 		FeedbackGroup.GET("/:id", app.Handler.GetFeedbackByID)
 		FeedbackGroup.DELETE("/:id/delete", app.Handler.DeleteFeedback)
 		FeedbackGroup.PUT("/:id/update", app.Handler.UpdateFeedbackFlightNumber)

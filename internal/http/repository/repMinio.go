@@ -10,13 +10,13 @@ import (
 	"github.com/minio/minio-go/v7"
 )
 
-type MinioRepository interface{
-    UploadServiceImage(userID, baggageID uint64, imageBytes []byte, contentType string) (string, error)
-    RemoveServiceImage(userID, baggageID uint64) error
+type MinioRepository interface {
+	UploadServiceImage(userID, groupID uint64, imageBytes []byte, contentType string) (string, error)
+	RemoveServiceImage(userID, groupID uint64) error
 }
 
-func (r *Repository) UploadServiceImage(baggageID, userID uint, imageBytes []byte, contentType string) (string, error) {
-    objectName := fmt.Sprintf("baggages/%d/image", baggageID)
+func (r *Repository) UploadServiceImage(groupID, userID uint, imageBytes []byte, contentType string) (string, error) {
+	objectName := fmt.Sprintf("groups/%d/image", groupID)
 
 	reader := io.NopCloser(bytes.NewReader(imageBytes))
 
@@ -24,28 +24,27 @@ func (r *Repository) UploadServiceImage(baggageID, userID uint, imageBytes []byt
 		ContentType: contentType,
 	})
 	if err != nil {
-        return "", errors.New("ошибка при добавлении изображения в минио бакет")
-    }
+		return "", errors.New("ошибка при добавлении изображения в минио бакет")
+	}
 
 	// Формирование URL изображения
 	imageURL := fmt.Sprintf("http://localhost:9000/images-bucket/%s", objectName)
 
-    return imageURL, nil
+	return imageURL, nil
 }
 
-func (r *Repository) RemoveServiceImage(baggageID, userID uint) error {
-    objectName := fmt.Sprintf("baggages/%d/image", baggageID)
+func (r *Repository) RemoveServiceImage(groupID, userID uint) error {
+	objectName := fmt.Sprintf("groups/%d/image", groupID)
 	err := r.mc.RemoveObject(context.TODO(), "images-bucket", objectName, minio.RemoveObjectOptions{})
 	if err != nil {
 		return errors.New("не удалось удалить изображение из бакет")
 	}
 
-    if err := r.db.Table("baggages").
-	Where("baggage_id = ?", baggageID).
-	Update("photo", nil).Error; 
-	err != nil {
-        return errors.New("ошибка при обновлении URL изображения в базе данных")
-    }
-	
-    return nil
+	if err := r.db.Table("groups").
+		Where("group_id = ?", groupID).
+		Update("photo", nil).Error; err != nil {
+		return errors.New("ошибка при обновлении URL изображения в базе данных")
+	}
+
+	return nil
 }

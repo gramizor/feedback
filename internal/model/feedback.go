@@ -2,42 +2,42 @@ package model
 
 import "time"
 
-type Delivery struct {
-	DeliveryID     uint      `gorm:"type:serial;primarykey" json:"delivery_id"`
+type Feedback struct {
+	FeedbackID     uint      `gorm:"type:serial;primarykey" json:"feedback_id"`
 	FlightNumber   string    `json:"flight_number"`
 	CreationDate   time.Time `json:"creation_date"`
 	FormationDate  time.Time `json:"formation_date"`
 	CompletionDate time.Time `json:"completion_date"`
-	DeliveryStatus string    `json:"delivery_status"`
+	FeedbackStatus string    `json:"feedback_status"`
 	UserID         uint      `json:"user_id"`
 	ModeratorID    uint      `json:"moderator_id"`
 }
 
-type DeliveryRequest struct {
-	DeliveryID     uint      `json:"delivery_id"`
+type FeedbackRequest struct {
+	FeedbackID     uint      `json:"feedback_id"`
 	FlightNumber   string    `json:"flight_number"`
 	CreationDate   time.Time `json:"creation_date"`
 	FormationDate  time.Time `json:"formation_date"`
 	CompletionDate time.Time `json:"completion_date"`
-	DeliveryStatus string    `json:"delivery_status"`
-	FullName 	   string 	 `json:"full_name"`
+	FeedbackStatus string    `json:"feedback_status"`
+	FullName       string    `json:"full_name"`
 }
 
-type DeliveryGetResponse struct{
-	DeliveryID 	   uint      `json:"delivery_id"`
+type FeedbackGetResponse struct {
+	FeedbackID     uint      `json:"feedback_id"`
 	FlightNumber   string    `json:"flight_number"`
 	CreationDate   time.Time `json:"creation_date"`
 	FormationDate  time.Time `json:"formation_date"`
 	CompletionDate time.Time `json:"completion_date"`
-	DeliveryStatus string    `json:"delivery_status"`
-	FullName 	   string 	 `json:"full_name"`
-	Baggages       []Baggage `json:"baggages"`
+	FeedbackStatus string    `json:"feedback_status"`
+	FullName       string    `json:"full_name"`
+	Groups         []Group   `json:"groups"`
 }
 
-type DeliveryUpdateFlightNumberRequest struct {
-	FlightNumber   string    `json:"flight_number"`
+type FeedbackUpdateFlightNumberRequest struct {
+	FlightNumber string `json:"flight_number"`
 }
 
-type DeliveryUpdateStatusRequest struct {
-	DeliveryStatus string    `json:"delivery_status"`
+type FeedbackUpdateStatusRequest struct {
+	FeedbackStatus string `json:"feedback_status"`
 }

@@ -1,6 +1,6 @@
 package delivery
 
-import "github.com/markgregr/RIP/internal/http/usecase"
+import "rest-apishka/internal/http/usecase"
 
 type Handler struct {
 	UseCase *usecase.UseCase
