@@ -21,7 +21,7 @@ func (app *Application) Run() {
 	docs.SwaggerInfo.Host = "localhost:8081"
 	docs.SwaggerInfo.BasePath = "/"
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
-	// Группа запросов для багажа
+	// Группа запросов для группы
 	GroupGroup := r.Group("/group")
 	{
 		GroupGroup.GET("/", app.Handler.GetGroups)
@@ -34,15 +34,14 @@ func (app *Application) Run() {
 		GroupGroup.POST("/:group_id/image", app.Handler.AddGroupImage)
 	}
 
-	// Группа запросов для доставки
+	// Группа запросов для опроса
 	FeedbackGroup := r.Group("/feedback")
 	{
 		FeedbackGroup.GET("/", app.Handler.GetFeedbacks)
 		FeedbackGroup.GET("/:id", app.Handler.GetFeedbackByID)
 		FeedbackGroup.DELETE("/:id/delete", app.Handler.DeleteFeedback)
-		FeedbackGroup.PUT("/:id/update", app.Handler.UpdateFeedbackFlightNumber)
-		FeedbackGroup.PUT("/:id/status/user", app.Handler.UpdateFeedbackStatusUser)           // Новый маршрут для обновления статуса доставки пользователем
-		FeedbackGroup.PUT("/:id/status/moderator", app.Handler.UpdateFeedbackStatusModerator) // Новый маршрут для обновления статуса доставки модератором
+		FeedbackGroup.PUT("/:id/status/user", app.Handler.UpdateFeedbackStatusUser)           // Новый маршрут для обновления статуса опроса пользователем
+		FeedbackGroup.PUT("/:id/status/moderator", app.Handler.UpdateFeedbackStatusModerator) // Новый маршрут для обновления статуса опроса модератором
 	}
 
 	addr := fmt.Sprintf("%s:%d", app.Config.ServiceHost, app.Config.ServicePort)

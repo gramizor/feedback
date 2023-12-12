@@ -12,7 +12,7 @@ services:
         target: /var/lib/postgresql/data
     ports:
       # порты
-      - "5432:5432"
+      - "5434:5432"
     environment:
       # переменные окружения, меняйте их если хотите поменять пароль, логин или название стартовой базы данных
       POSTGRES_USER: postgres
