@@ -37,7 +37,7 @@ func (r *Repository) RemoveServiceImage(groupID, userID uint) error {
 	objectName := fmt.Sprintf("groups/%d/image", groupID)
 	err := r.mc.RemoveObject(context.TODO(), "images-bucket", objectName, minio.RemoveObjectOptions{})
 	if err != nil {
-		return errors.New("не удалось удалить изображение из бакет")
+		return errors.New("не удалось удалить изображение из бакета")
 	}
 
 	if err := r.db.Table("groups").

@@ -10,14 +10,14 @@ import (
 type GroupUseCase interface {
 }
 
-func (uc *UseCase) GetGroups(searchCode string, userID uint) (model.GroupsGetResponse, error) {
+func (uc *UseCase) GetGroups(groupCode string, userID uint) (model.GroupsGetResponse, error) {
 	if userID <= 0 {
 		return model.GroupsGetResponse{}, errors.New("недопустимый ИД пользователя")
 	}
 
-	searchCode = strings.ToUpper(searchCode + "%")
+	groupCode = strings.ToUpper(groupCode + "%")
 
-	groups, err := uc.Repository.GetGroups(searchCode, userID)
+	groups, err := uc.Repository.GetGroups(groupCode, userID)
 	if err != nil {
 		return model.GroupsGetResponse{}, err
 	}
@@ -27,7 +27,7 @@ func (uc *UseCase) GetGroups(searchCode string, userID uint) (model.GroupsGetRes
 
 func (uc *UseCase) GetGroupByID(groupID, userID uint) (model.Group, error) {
 	if groupID <= 0 {
-		return model.Group{}, errors.New("недопустимый ИД багажа")
+		return model.Group{}, errors.New("недопустимый ИД группы")
 	}
 	if userID <= 0 {
 		return model.Group{}, errors.New("недопустимый ИД пользователя")
@@ -46,36 +46,24 @@ func (uc *UseCase) CreateGroup(userID uint, requestGroup model.GroupRequest) err
 		return errors.New("недопустимый ИД пользователя")
 	}
 	if requestGroup.GroupCode == "" {
-		return errors.New("код багажа должен быть заполнен")
+		return errors.New("название группы должно быть заполнено")
 	}
-	if requestGroup.Weight == 0 {
-		return errors.New("вес багажа должен быть заполнен")
+	if requestGroup.Contacts == "" {
+		return errors.New("контакты группы должны быть заполнены")
 	}
-	if requestGroup.Size == "" {
-		return errors.New("размер багажа должен быть заполнен")
+	if requestGroup.Course == 0 {
+		return errors.New("номер курса группы должен быть заполнен")
 	}
-	if requestGroup.GroupType == "" {
-		return errors.New("тип багажа должен быть заполнен")
-	}
-	if requestGroup.OwnerName == "" {
-		return errors.New("владелец багажа должен быть заполнен")
-	}
-	if requestGroup.PasportDetails == "" {
-		return errors.New("паспортные данные владельца багажа должны быть заполнен")
-	}
-	if requestGroup.Airline == "" {
-		return errors.New("авиакомпания должна быть заполнена")
+	if requestGroup.Students == 0 {
+		return errors.New("количество студентов должно быть заполнено")
 	}
 
 	group := model.Group{
-		GroupCode:      requestGroup.GroupCode,
-		Weight:         requestGroup.Weight,
-		Size:           requestGroup.Size,
-		GroupType:      requestGroup.GroupType,
-		OwnerName:      requestGroup.OwnerName,
-		PasportDetails: requestGroup.PasportDetails,
-		Airline:        requestGroup.Airline,
-		GroupStatus:    model.GROUP_STATUS_ACTIVE,
+		GroupCode:   requestGroup.GroupCode,
+		Contacts:    requestGroup.Contacts,
+		Course:      requestGroup.Course,
+		Students:    requestGroup.Students,
+		GroupStatus: model.GROUP_STATUS_ACTIVE,
 	}
 
 	err := uc.Repository.CreateGroup(userID, group)
@@ -88,7 +76,7 @@ func (uc *UseCase) CreateGroup(userID uint, requestGroup model.GroupRequest) err
 
 func (uc *UseCase) DeleteGroup(groupID, userID uint) error {
 	if groupID <= 0 {
-		return errors.New("недопустимый ИД багажа")
+		return errors.New("недопустимый ИД группы")
 	}
 	if userID <= 0 {
 		return errors.New("недопустимый ИД пользователя")
@@ -109,20 +97,17 @@ func (uc *UseCase) DeleteGroup(groupID, userID uint) error {
 
 func (uc *UseCase) UpdateGroup(groupID, userID uint, requestGroup model.GroupRequest) error {
 	if groupID <= 0 {
-		return errors.New("недопустимый ИД багажа")
+		return errors.New("недопустимый ИД группы")
 	}
 	if userID <= 0 {
 		return errors.New("недопустимый ИД пользователя")
 	}
 
 	group := model.Group{
-		GroupCode:      requestGroup.GroupCode,
-		Weight:         requestGroup.Weight,
-		Size:           requestGroup.Size,
-		GroupType:      requestGroup.GroupType,
-		OwnerName:      requestGroup.OwnerName,
-		PasportDetails: requestGroup.PasportDetails,
-		Airline:        requestGroup.Airline,
+		GroupCode: requestGroup.GroupCode,
+		Contacts:  requestGroup.Contacts,
+		Course:    requestGroup.Course,
+		Students:  requestGroup.Students,
 	}
 
 	err := uc.Repository.UpdateGroup(groupID, userID, group)
@@ -135,7 +120,7 @@ func (uc *UseCase) UpdateGroup(groupID, userID uint, requestGroup model.GroupReq
 
 func (uc *UseCase) AddGroupToFeedback(groupID, userID, moderatorID uint) error {
 	if groupID <= 0 {
-		return errors.New("недопустимый ИД багажа")
+		return errors.New("недопустимый ИД группы")
 	}
 	if userID <= 0 {
 		return errors.New("недопустимый ИД пользователя")
@@ -154,7 +139,7 @@ func (uc *UseCase) AddGroupToFeedback(groupID, userID, moderatorID uint) error {
 
 func (uc *UseCase) RemoveGroupFromFeedback(groupID, userID uint) error {
 	if groupID <= 0 {
-		return errors.New("недопустимый ИД багажа")
+		return errors.New("недопустимый ИД группы")
 	}
 	if userID <= 0 {
 		return errors.New("недопустимый ИД пользователя")
@@ -170,7 +155,7 @@ func (uc *UseCase) RemoveGroupFromFeedback(groupID, userID uint) error {
 
 func (uc *UseCase) AddGroupImage(groupID, userID uint, imageBytes []byte, ContentType string) error {
 	if groupID <= 0 {
-		return errors.New("недопустимый ИД багажа")
+		return errors.New("недопустимый ИД группы")
 	}
 	if userID <= 0 {
 		return errors.New("недопустимый ИД пользователя")

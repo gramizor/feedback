@@ -2,8 +2,8 @@ basePath: /
 host: http://localhost:8081
 info:
   contact: {}
-  description: API server for BagTracker application
-  title: BagTracker RestAPI
+  description: API server for Feedback application
+  title: Feedback RestAPI
   version: "1.0"
 paths: {}
 securityDefinitions:

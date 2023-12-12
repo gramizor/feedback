@@ -11,19 +11,19 @@ import (
 	"github.com/gin-gonic/gin"
 )
 
-// @Summary Получение списка багажа
-// @Description Возращает список всех активных багажей
-// @Tags Багаж
+// @Summary Получение списка групп
+// @Description Возращает список всех активных групп
+// @Tags Группа
 // @Produce json
-// @Param searchCode query string false "Код багажа" Format(email)
-// @Success 200 {object} model.GroupsGetResponse "Список багажей"
+// @Param groupCode query string false "Код группы" Format(email)
+// @Success 200 {object} model.GroupsGetResponse "Список групп"
 // @Failure 500 {object} model.GroupsGetResponse "Ошибка сервера"
 // @Router /group [get]
 func (h *Handler) GetGroups(c *gin.Context) {
 	authInstance := auth.GetAuthInstance()
-	searchCode := c.DefaultQuery("searchCode", "")
+	groupCode := c.DefaultQuery("groupCode", "")
 
-	groups, err := h.UseCase.GetGroups(searchCode, authInstance.UserID)
+	groups, err := h.UseCase.GetGroups(groupCode, authInstance.UserID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -32,12 +32,12 @@ func (h *Handler) GetGroups(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"groups": groups})
 }
 
-// @Summary Получение багажа по ID
-// @Description Возвращает информацию о багаже по его ID
-// @Tags Багаж
+// @Summary Получение группы по ID
+// @Description Возвращает информацию о группе по его ID
+// @Tags Группа
 // @Produce json
-// @Param group_id path int true "ID багажа"
-// @Success 200 {object} model.Group "Информация о багаже"
+// @Param group_id path int true "ID группы"
+// @Success 200 {object} model.Group "Информация о группе"
 // @Failure 400 {object} model.Group "Некорректный запрос"
 // @Failure 500 {object} model.Group "Внутренняя ошибка сервера"
 // @Router /group/{group_id} [get]
@@ -46,7 +46,7 @@ func (h *Handler) GetGroupByID(c *gin.Context) {
 
 	groupID, err := strconv.Atoi(c.Param("group_id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "недопустимый ИД багажа"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "недопустимый ИД группы"})
 		return
 	}
 
@@ -59,19 +59,19 @@ func (h *Handler) GetGroupByID(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"group": group})
 }
 
-// @Summary Создание нового багажа
-// @Description Создает новый багаж с предоставленными данными
-// @Tags Багаж
+// @Summary Создание новой группы
+// @Description Создает новую группу с предоставленными данными
+// @Tags Группа
 // @Accept json
 // @Produce json
-// @Param searchCode query string false "Код багажа" Format(email)
-// @Success 200 {object} model.GroupsGetResponse "Список багажей"
+// @Param groupCode query string false "Код группы" Format(email)
+// @Success 200 {object} model.GroupsGetResponse "Список групп"
 // @Failure 400 {object} model.GroupsGetResponse "Некорректный запрос"
 // @Failure 500 {object} model.GroupsGetResponse "Внутренняя ошибка сервера"
 // @Router /group/create [post]
 func (h *Handler) CreateGroup(c *gin.Context) {
 	authInstance := auth.GetAuthInstance()
-	searchCode := c.DefaultQuery("searchCode", "")
+	groupCode := c.DefaultQuery("groupCode", "")
 
 	var group model.GroupRequest
 
@@ -86,7 +86,7 @@ func (h *Handler) CreateGroup(c *gin.Context) {
 		return
 	}
 
-	groups, err := h.UseCase.GetGroups(searchCode, authInstance.UserID)
+	groups, err := h.UseCase.GetGroups(groupCode, authInstance.UserID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -95,23 +95,23 @@ func (h *Handler) CreateGroup(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"groups": groups})
 }
 
-// @Summary Удаление багажа
-// @Description Удаляет багаж по его ID
-// @Tags Багаж
+// @Summary Удаление группы
+// @Description Удаляет группу по ее ID
+// @Tags Группа
 // @Produce json
-// @Param group_id path int true "ID багажа"
-// @Param searchCode query string false "Код багажа" Format(email)
-// @Success 200 {object} model.GroupsGetResponse "Список багажей"
+// @Param group_id path int true "ID группы"
+// @Param groupCode query string false "Код группы" Format(email)
+// @Success 200 {object} model.GroupsGetResponse "Список групп"
 // @Failure 400 {object} model.GroupsGetResponse "Некорректный запрос"
 // @Failure 500 {object} model.GroupsGetResponse "Внутренняя ошибка сервера"
 // @Router /group/{group_id}/delete [delete]
 func (h *Handler) DeleteGroup(c *gin.Context) {
 	authInstance := auth.GetAuthInstance()
-	searchCode := c.DefaultQuery("searchCode", "")
+	groupCode := c.DefaultQuery("groupCode", "")
 
 	groupID, err := strconv.Atoi(c.Param("group_id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "недопустимый ИД багажа"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "недопустимый ИД группы"})
 		return
 	}
 
@@ -121,7 +121,7 @@ func (h *Handler) DeleteGroup(c *gin.Context) {
 		return
 	}
 
-	groups, err := h.UseCase.GetGroups(searchCode, authInstance.UserID)
+	groups, err := h.UseCase.GetGroups(groupCode, authInstance.UserID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -130,13 +130,13 @@ func (h *Handler) DeleteGroup(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"groups": groups})
 }
 
-// @Summary Обновление информации о багаже
-// @Description Обновляет информацию о багаже по его ID
-// @Tags Багаж
+// @Summary Обновление информации о группе
+// @Description Обновляет информацию о группе по ее ID
+// @Tags Группа
 // @Accept json
 // @Produce json
-// @Param group_id path int true "ID багажа"
-// @Success 200 {object} model.Group "Информация о багаже"
+// @Param group_id path int true "ID группы"
+// @Success 200 {object} model.Group "Информация о группе"
 // @Failure 400 {object} model.Group "Некорректный запрос"
 // @Failure 500 {object} model.Group "Внутренняя ошибка сервера"
 // @Router /group/{group_id}/update [put]
@@ -145,7 +145,7 @@ func (h *Handler) UpdateGroup(c *gin.Context) {
 
 	groupID, err := strconv.Atoi(c.Param("group_id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": gin.H{"error": "недопустимый ИД багажа"}})
+		c.JSON(http.StatusBadRequest, gin.H{"error": gin.H{"error": "недопустимый ИД группы"}})
 		return
 	}
 
@@ -170,23 +170,23 @@ func (h *Handler) UpdateGroup(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"group": updatedGroup})
 }
 
-// @Summary Добавление багажа к доставке
-// @Description Добавляет багаж к доставке по его ID
-// @Tags Багаж
+// @Summary Добавление группы к опросу
+// @Description Добавляет группу к опросу по ее ID
+// @Tags Группа
 // @Produce json
-// @Param group_id path int true "ID багажа"
-// @Param searchCode query string false "Код багажа" Format(email)
-// @Success 200 {object} model.GroupsGetResponse  "Список багажей"
+// @Param group_id path int true "ID группы"
+// @Param groupCode query string false "Код группы" Format(email)
+// @Success 200 {object} model.GroupsGetResponse  "Список групп"
 // @Failure 400 {object} model.GroupsGetResponse  "Некорректный запрос"
 // @Failure 500 {object} model.GroupsGetResponse  "Внутренняя ошибка сервера"
 // @Router /group/{group_id}/feedback [post]
 func (h *Handler) AddGroupToFeedback(c *gin.Context) {
 	authInstance := auth.GetAuthInstance()
-	searchCode := c.DefaultQuery("searchCode", "")
+	groupCode := c.DefaultQuery("groupCode", "")
 
 	groupID, err := strconv.Atoi(c.Param("group_id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "недопустимый ИД багажа"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "недопустимый ИД группы"})
 		return
 	}
 
@@ -196,7 +196,7 @@ func (h *Handler) AddGroupToFeedback(c *gin.Context) {
 		return
 	}
 
-	groups, err := h.UseCase.GetGroups(searchCode, authInstance.UserID)
+	groups, err := h.UseCase.GetGroups(groupCode, authInstance.UserID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -205,23 +205,23 @@ func (h *Handler) AddGroupToFeedback(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"groups": groups})
 }
 
-// @Summary Удаление багажа из доставки
-// @Description Удаляет багаж из доставки по его ID
-// @Tags Багаж
+// @Summary Удаление группы из опроса
+// @Description Удаляет группу из опроса по ее ID
+// @Tags Группа
 // @Produce json
-// @Param group_id path int true "ID багажа"
-// @Param searchCode query string false "Код багажа" Format(email)
-// @Success 200 {object} model.GroupsGetResponse "Список багажей"
+// @Param group_id path int true "ID группы"
+// @Param groupCode query string false "Код группы" Format(email)
+// @Success 200 {object} model.GroupsGetResponse "Список групп"
 // @Failure 400 {object} model.GroupsGetResponse "Некорректный запрос"
 // @Failure 500 {object} model.GroupsGetResponse "Внутренняя ошибка сервера"
 // @Router /groups/{group_id}/feedback [post]
 func (h *Handler) RemoveGroupFromFeedback(c *gin.Context) {
 	authInstance := auth.GetAuthInstance()
-	searchCode := c.DefaultQuery("searchCode", "")
+	groupCode := c.DefaultQuery("groupCode", "")
 
 	groupID, err := strconv.Atoi(c.Param("group_id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "недопустимый ИД багажа"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "недопустимый ИД группы"})
 		return
 	}
 
@@ -231,7 +231,7 @@ func (h *Handler) RemoveGroupFromFeedback(c *gin.Context) {
 		return
 	}
 
-	groups, err := h.UseCase.GetGroups(searchCode, authInstance.UserID)
+	groups, err := h.UseCase.GetGroups(groupCode, authInstance.UserID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -240,14 +240,14 @@ func (h *Handler) RemoveGroupFromFeedback(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{"groups": groups})
 }
 
-// @Summary Добавление изображения к багажу
-// @Description Добавляет изображение к багажу по его ID
-// @Tags Багаж
+// @Summary Добавление изображения к группе
+// @Description Добавляет изображение к группе по его ID
+// @Tags Группа
 // @Accept mpfd
 // @Produce json
-// @Param group_id path int true "ID багажа"
-// @Param image formData file true "Изображение багажа"
-// @Success 200 {object} model.Group "Информация о багаже с изображением"
+// @Param group_id path int true "ID группы"
+// @Param image formData file true "Изображение группы"
+// @Success 200 {object} model.Group "Информация о группе с изображением"
 // @Success 200 {object} model.Group
 // @Failure 400 {object} model.Group "Некорректный запрос"
 // @Failure 500 {object} model.Group "Внутренняя ошибка сервера"
@@ -257,7 +257,7 @@ func (h *Handler) AddGroupImage(c *gin.Context) {
 
 	groupID, err := strconv.Atoi(c.Param("group_id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "недопустимый ИД багажа"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "недопустимый ИД группы"})
 		return
 	}
 

@@ -7,15 +7,14 @@ import (
 	"rest-apishka/internal/model"
 )
 
-func (uc *UseCase) GetFeedbacksUser(searchFlightNumber, startFormationDate, endFormationDate, feedbackStatus string, userID uint) ([]model.FeedbackRequest, error) {
-	searchFlightNumber = strings.ToUpper(searchFlightNumber + "%")
+func (uc *UseCase) GetFeedbacksUser(startFormationDate, endFormationDate, feedbackStatus string, userID uint) ([]model.FeedbackRequest, error) {
 	feedbackStatus = strings.ToLower(feedbackStatus + "%")
 
 	if userID <= 0 {
 		return nil, errors.New("недопустимый ИД пользователя")
 	}
 
-	feedbacks, err := uc.Repository.GetFeedbacksUser(searchFlightNumber, startFormationDate, endFormationDate, feedbackStatus, userID)
+	feedbacks, err := uc.Repository.GetFeedbacksUser(startFormationDate, endFormationDate, feedbackStatus, userID)
 	if err != nil {
 		return nil, err
 	}
@@ -25,7 +24,7 @@ func (uc *UseCase) GetFeedbacksUser(searchFlightNumber, startFormationDate, endF
 
 func (uc *UseCase) GetFeedbackByIDUser(feedbackID, userID uint) (model.FeedbackGetResponse, error) {
 	if feedbackID <= 0 {
-		return model.FeedbackGetResponse{}, errors.New("недопустимый ИД доставки")
+		return model.FeedbackGetResponse{}, errors.New("недопустимый ИД опроса")
 	}
 	if userID <= 0 {
 		return model.FeedbackGetResponse{}, errors.New("недопустимый ИД пользователя")
@@ -41,7 +40,7 @@ func (uc *UseCase) GetFeedbackByIDUser(feedbackID, userID uint) (model.FeedbackG
 
 func (uc *UseCase) DeleteFeedbackUser(feedbackID, userID uint) error {
 	if feedbackID <= 0 {
-		return errors.New("недопустимый ИД доставки")
+		return errors.New("недопустимый ИД опроса")
 	}
 	if userID <= 0 {
 		return errors.New("недопустимый ИД пользователя")
@@ -55,28 +54,9 @@ func (uc *UseCase) DeleteFeedbackUser(feedbackID, userID uint) error {
 	return nil
 }
 
-func (uc *UseCase) UpdateFlightNumberUser(feedbackID, userID uint, flightNumber model.FeedbackUpdateFlightNumberRequest) error {
-	if feedbackID <= 0 {
-		return errors.New("недопустимый ИД доставки")
-	}
-	if userID <= 0 {
-		return errors.New("недопустимый ИД пользователя")
-	}
-	if len(flightNumber.FlightNumber) != 6 {
-		return errors.New("недопустимый номер рейса")
-	}
-
-	err := uc.Repository.UpdateFlightNumberUser(feedbackID, userID, flightNumber)
-	if err != nil {
-		return err
-	}
-
-	return nil
-}
-
 func (uc *UseCase) UpdateFeedbackStatusUser(feedbackID, userID uint) error {
 	if feedbackID <= 0 {
-		return errors.New("недопустимый ИД доставки")
+		return errors.New("недопустимый ИД опроса")
 	}
 	if userID <= 0 {
 		return errors.New("недопустимый ИД пользователя")
