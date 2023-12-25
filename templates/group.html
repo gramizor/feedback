@@ -23,9 +23,6 @@
                 <p>Контакты: {{ .Contacts }}</p>
                 <p>Количество студентов: {{ .Students }}</p>
             </div>
-            <form action="/delete?delete={{.Id}}" method="POST" class="delete-button">
-                <button type="submit" class="button">Удалить группу</button>
-            </form>
         </div>
         <div class="buttons">
             <a href="/" class="back">Вернуться на главную</a>

@@ -31,6 +31,9 @@
                 <img src="{{ .Image }}" alt="{{ .Name }}">
                 <h3>{{ .Name }}</h3>
                 <p>Контакты: {{ .Contacts }}</p>
+                <form action="/delete?delete={{.Id}}" method="POST" class="delete-button">
+                    <button type="submit" class="button">Удалить группу</button>
+                </form>
             </div>
         </a>
         {{ end }}
