@@ -22,8 +22,36 @@ import (
 func (h *Handler) GetGroups(c *gin.Context) {
 	authInstance := auth.GetAuthInstance()
 	groupCode := c.DefaultQuery("groupCode", "")
+	page := c.DefaultQuery("page", "1")
+	pageSize := c.DefaultQuery("pageSize", "10")
 
-	groups, err := h.UseCase.GetGroups(groupCode, authInstance.UserID)
+	groups, err := h.UseCase.GetGroupsPaged(groupCode, authInstance.UserID, page, pageSize)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{"groups": groups})
+}
+
+// @Summary Получение списка групп с пагинацией
+// @Description Возвращает список всех активных групп с использованием пагинации
+// @Tags Группа
+// @Produce json
+// @Param groupCode query string false "Код группы" Format(email)
+// @Param page query int false "Номер страницы" Format(email)
+// @Param pageSize query int false "Размер страницы" Format(email)
+// @Success 200 {object} model.GroupsGetResponse "Список групп"
+// @Failure 400 {object} model.GroupsGetResponse "Некорректный запрос"
+// @Failure 500 {object} model.GroupsGetResponse "Внутренняя ошибка сервера"
+// @Router /group/paginate [get]
+func (h *Handler) GetGroupsPaged(c *gin.Context) {
+	authInstance := auth.GetAuthInstance()
+	groupCode := c.DefaultQuery("groupCode", "")
+	page := c.DefaultQuery("page", "1")
+	pageSize := c.DefaultQuery("pageSize", "10")
+
+	groups, err := h.UseCase.GetGroupsPaged(groupCode, authInstance.UserID, page, pageSize)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

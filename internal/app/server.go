@@ -25,6 +25,7 @@ func (app *Application) Run() {
 	GroupGroup := r.Group("/group")
 	{
 		GroupGroup.GET("/", app.Handler.GetGroups)
+		GroupGroup.GET("/paginate", app.Handler.GetGroupsPaged)
 		GroupGroup.GET("/:group_id", app.Handler.GetGroupByID)
 		GroupGroup.DELETE("/:group_id/delete", app.Handler.DeleteGroup)
 		GroupGroup.POST("/create", app.Handler.CreateGroup)

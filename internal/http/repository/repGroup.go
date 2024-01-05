@@ -35,6 +35,30 @@ func (r *Repository) GetGroups(groupCode string, userID uint) (model.GroupsGetRe
 	return groupResponse, nil
 }
 
+func (r *Repository) GetGroupsPaged(groupCode string, userID uint, page int, pageSize int) (model.GroupsGetResponse, error) {
+	var feedbackID uint
+	if err := r.db.
+		Table("feedbacks").
+		Select("feedbacks.feedback_id").
+		Where("user_id = ? AND feedback_status = ?", userID, model.FEEDBACK_STATUS_DRAFT).
+		Take(&feedbackID).Error; err != nil {
+	}
+
+	var groups []model.Group
+	if err := r.db.Table("groups").
+		Where("groups.group_status = ? AND groups.group_code LIKE ?", model.GROUP_STATUS_ACTIVE, groupCode).
+		Offset((page - 1) * pageSize).Limit(pageSize).Scan(&groups).Error; err != nil {
+		return model.GroupsGetResponse{}, errors.New("ошибка нахождения группы")
+	}
+
+	groupResponse := model.GroupsGetResponse{
+		Groups:     groups,
+		FeedbackID: feedbackID,
+	}
+
+	return groupResponse, nil
+}
+
 func (r *Repository) GetGroupByID(groupID, userID uint) (model.Group, error) {
 	var group model.Group
 
