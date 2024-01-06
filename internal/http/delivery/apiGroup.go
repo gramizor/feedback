@@ -22,10 +22,11 @@ import (
 func (h *Handler) GetGroups(c *gin.Context) {
 	authInstance := auth.GetAuthInstance()
 	groupCode := c.DefaultQuery("groupCode", "")
+	courseNumber, _ := strconv.Atoi(c.DefaultQuery("courseNumber", "0"))
 	page := c.DefaultQuery("page", "1")
 	pageSize := c.DefaultQuery("pageSize", "10")
 
-	groups, err := h.UseCase.GetGroupsPaged(groupCode, authInstance.UserID, page, pageSize)
+	groups, err := h.UseCase.GetGroupsPaged(groupCode, courseNumber, authInstance.UserID, page, pageSize)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -48,16 +49,17 @@ func (h *Handler) GetGroups(c *gin.Context) {
 func (h *Handler) GetGroupsPaged(c *gin.Context) {
 	authInstance := auth.GetAuthInstance()
 	groupCode := c.DefaultQuery("groupCode", "")
+	courseNumber, _ := strconv.Atoi(c.DefaultQuery("courseNumber", "0"))
 	page := c.DefaultQuery("page", "1")
 	pageSize := c.DefaultQuery("pageSize", "10")
 
-	groups, err := h.UseCase.GetGroupsPaged(groupCode, authInstance.UserID, page, pageSize)
+	groups, err := h.UseCase.GetGroupsPaged(groupCode, courseNumber, authInstance.UserID, page, pageSize)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"groups": groups})
+	c.JSON(http.StatusOK, gin.H{"groups": groups.Groups, "feedback_id": groups.FeedbackID})
 }
 
 // @Summary Получение группы по ID

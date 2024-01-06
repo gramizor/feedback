@@ -26,8 +26,7 @@ func (uc *UseCase) GetGroups(groupCode string, userID uint) (model.GroupsGetResp
 	return groups, nil
 }
 
-func (uc *UseCase) GetGroupsPaged(groupCode string, userID uint, page string, pageSize string) (model.GroupsGetResponse, error) {
-	// Преобразуй page и pageSize в числа
+func (uc *UseCase) GetGroupsPaged(groupCode string, courseNumber int, userID uint, page string, pageSize string) (model.GroupsGetResponse, error) {
 	pageNum, err := strconv.Atoi(page)
 	if err != nil {
 		return model.GroupsGetResponse{}, errors.New("некорректное значение страницы")
@@ -44,13 +43,17 @@ func (uc *UseCase) GetGroupsPaged(groupCode string, userID uint, page string, pa
 
 	groupCode = strings.ToUpper(groupCode + "%")
 
-	// Передай новые параметры в репозиторий
-	groups, err := uc.Repository.GetGroupsPaged(groupCode, userID, pageNum, pageSizeNum)
+	groups, err := uc.Repository.GetGroupsPaged(groupCode, courseNumber, userID, pageNum, pageSizeNum)
 	if err != nil {
 		return model.GroupsGetResponse{}, err
 	}
 
-	return groups, nil
+	groupResponse := model.GroupsGetResponse{
+		Groups:     groups.Groups,
+		FeedbackID: groups.FeedbackID,
+	}
+
+	return groupResponse, nil
 }
 
 func (uc *UseCase) GetGroupByID(groupID, userID uint) (model.Group, error) {
