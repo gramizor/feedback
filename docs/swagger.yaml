@@ -1,223 +1,371 @@
 definitions:
-  model.Baggage:
+  model.FeedbackGetResponse:
     properties:
-      airline:
-        example: AirlineX
+      completion_date:
         type: string
-      baggage_code:
-        example: ABC123
+      creation_date:
         type: string
-      baggage_id:
+      feedback_id:
         type: integer
-      baggage_status:
-        example: checked
+      feedback_status:
         type: string
-      baggage_type:
-        example: suitcase
+      formation_date:
         type: string
-      owner_name:
-        example: John Doe
+      full_name:
         type: string
-      pasport_details:
-        example: "123456789"
-        type: string
-      photo:
-        example: http://example.com/baggage.jpg
-        type: string
-      size:
-        example: large
-        type: string
-      weight:
-        example: 23.5
-        type: number
-    type: object
-  model.BaggagesGetResponse:
-    properties:
-      baggages:
+      groups:
         items:
-          $ref: '#/definitions/model.Baggage'
+          $ref: '#/definitions/model.Group'
         type: array
-      delivery_id:
+    type: object
+  model.FeedbackRequest:
+    properties:
+      completion_date:
+        type: string
+      creation_date:
+        type: string
+      feedback_id:
+        type: integer
+      feedback_status:
+        type: string
+      formation_date:
+        type: string
+      full_name:
+        type: string
+    type: object
+  model.FeedbackUpdateStatusRequest:
+    properties:
+      feedback_status:
+        type: string
+    type: object
+  model.Group:
+    properties:
+      contacts:
+        example: +7(999)999-99-99
+        type: string
+      course:
         example: 1
         type: integer
+      group_code:
+        example: RT5-51B
+        type: string
+      group_id:
+        type: integer
+      group_status:
+        example: обучается
+        type: string
+      photo:
+        example: http://example.com/group.jpg
+        type: string
+      students:
+        example: 23
+        type: integer
     type: object
-  model.DeliveryGetResponse:
+  model.GroupsGetResponse:
     properties:
-      baggages:
+      feedback_id:
+        example: 1
+        type: integer
+      groups:
         items:
-          $ref: '#/definitions/model.Baggage'
+          $ref: '#/definitions/model.Group'
         type: array
-      completion_date:
-        type: string
-      creation_date:
-        type: string
-      delivery_id:
-        type: integer
-      delivery_status:
-        type: string
-      flight_number:
-        type: string
-      formation_date:
+    type: object
+  model.Role:
+    enum:
+    - пользователь
+    - модератор
+    type: string
+    x-enum-varnames:
+    - UserRole
+    - ModeratorRole
+  model.User:
+    properties:
+      email:
         type: string
       full_name:
         type: string
-    type: object
-  model.DeliveryRequest:
-    properties:
-      completion_date:
+      password:
         type: string
-      creation_date:
-        type: string
-      delivery_id:
+      role:
+        $ref: '#/definitions/model.Role'
+      user_id:
         type: integer
-      delivery_status:
+    type: object
+  model.UserLoginRequest:
+    properties:
+      email:
         type: string
-      flight_number:
+      password:
         type: string
-      formation_date:
+    type: object
+  model.UserRegisterRequest:
+    properties:
+      email:
         type: string
       full_name:
         type: string
-    type: object
-  model.DeliveryUpdateFlightNumberRequest:
-    properties:
-      flight_number:
-        type: string
-    type: object
-  model.DeliveryUpdateStatusRequest:
-    properties:
-      delivery_status:
+      password:
         type: string
     type: object
 info:
   contact: {}
 paths:
-  /baggage:
+  /feedback/{id}:
     get:
-      description: Возращает список всех активных багажей
+      description: Возвращает информацию об опросе по её идентификатору
       parameters:
-      - description: Код багажа
-        format: email
-        in: query
-        name: searchCode
-        type: string
+      - description: Идентификатор опроса
+        in: path
+        name: id
+        required: true
+        type: integer
       produces:
       - application/json
       responses:
         "200":
-          description: Список багажей
+          description: Информация об опросе
           schema:
-            $ref: '#/definitions/model.BaggagesGetResponse'
+            $ref: '#/definitions/model.FeedbackGetResponse'
+        "400":
+          description: Недопустимый идентификатор опроса
+          schema:
+            $ref: '#/definitions/model.FeedbackGetResponse'
         "500":
           description: Ошибка сервера
           schema:
-            $ref: '#/definitions/model.BaggagesGetResponse'
-      summary: Получение списка багажа
+            $ref: '#/definitions/model.FeedbackGetResponse'
+      summary: Получение опроса по идентификатору
       tags:
-      - Багаж
-  /baggage/{baggage_id}:
-    get:
-      description: Возвращает информацию о багаже по его ID
-      parameters:
-      - description: ID багажа
-        in: path
-        name: baggage_id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Информация о багаже
-          schema:
-            $ref: '#/definitions/model.Baggage'
-        "400":
-          description: Некорректный запрос
-          schema:
-            $ref: '#/definitions/model.Baggage'
-        "500":
-          description: Внутренняя ошибка сервера
-          schema:
-            $ref: '#/definitions/model.Baggage'
-      summary: Получение багажа по ID
-      tags:
-      - Багаж
-  /baggage/{baggage_id}/delete:
+      - Опрос
+  /feedback/{id}/delete:
     delete:
-      description: Удаляет багаж по его ID
+      description: Удаляет опрос по её идентификатору
       parameters:
-      - description: ID багажа
+      - description: Идентификатор опроса
         in: path
-        name: baggage_id
+        name: id
         required: true
         type: integer
-      - description: Код багажа
+      - description: Начало даты формирования
         format: email
         in: query
-        name: searchCode
+        name: startFormationDate
+        type: string
+      - description: Конец даты формирования
+        format: email
+        in: query
+        name: endFormationDate
+        type: string
+      - description: Статус опроса
+        format: email
+        in: query
+        name: feedbackStatus
         type: string
       produces:
       - application/json
       responses:
         "200":
-          description: Список багажей
+          description: Список групп
           schema:
-            $ref: '#/definitions/model.BaggagesGetResponse'
+            $ref: '#/definitions/model.FeedbackRequest'
+        "400":
+          description: Недопустимый идентификатор опроса
+          schema:
+            $ref: '#/definitions/model.FeedbackRequest'
+        "500":
+          description: Ошибка сервера
+          schema:
+            $ref: '#/definitions/model.FeedbackRequest'
+      summary: Удаление опроса
+      tags:
+      - Опрос
+  /feedback/{id}/status:
+    put:
+      description: Обновляет статус опроса для модератора по идентификатору опроса
+      parameters:
+      - description: Идентификатор опроса
+        in: path
+        name: id
+        required: true
+        type: integer
+      - description: Новый статус опроса
+        in: body
+        name: feedbackStatus
+        required: true
+        schema:
+          $ref: '#/definitions/model.FeedbackUpdateStatusRequest'
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Информация о доставке
+          schema:
+            $ref: '#/definitions/model.FeedbackGetResponse'
+        "400":
+          description: Недопустимый идентификатор опроса или ошибка чтения JSON объекта
+          schema:
+            $ref: '#/definitions/model.FeedbackGetResponse'
+        "500":
+          description: Ошибка сервера
+          schema:
+            $ref: '#/definitions/model.FeedbackGetResponse'
+      summary: Обновление статуса опроса для модератора
+      tags:
+      - Опрос
+  /feedback/{id}/user:
+    put:
+      description: Обновляет статус опроса для пользователя по идентификатору опроса
+      parameters:
+      - description: Идентификатор опроса
+        in: path
+        name: id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Информация о доставке
+          schema:
+            $ref: '#/definitions/model.FeedbackGetResponse'
+        "400":
+          description: Недопустимый идентификатор опроса
+          schema:
+            $ref: '#/definitions/model.FeedbackGetResponse'
+        "500":
+          description: Ошибка сервера
+          schema:
+            $ref: '#/definitions/model.FeedbackGetResponse'
+      summary: Обновление статуса опроса для пользователя
+      tags:
+      - Опрос
+  /group:
+    get:
+      description: Возращает список всех активных групп
+      parameters:
+      - description: Код группы
+        format: email
+        in: query
+        name: groupCode
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список групп
+          schema:
+            $ref: '#/definitions/model.GroupsGetResponse'
+        "500":
+          description: Ошибка сервера
+          schema:
+            $ref: '#/definitions/model.GroupsGetResponse'
+      summary: Получение списка групп
+      tags:
+      - Группа
+  /group/{group_id}:
+    get:
+      description: Возвращает информацию о группе по его ID
+      parameters:
+      - description: ID группы
+        in: path
+        name: group_id
+        required: true
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Информация о группе
+          schema:
+            $ref: '#/definitions/model.Group'
         "400":
           description: Некорректный запрос
           schema:
-            $ref: '#/definitions/model.BaggagesGetResponse'
+            $ref: '#/definitions/model.Group'
         "500":
           description: Внутренняя ошибка сервера
           schema:
-            $ref: '#/definitions/model.BaggagesGetResponse'
-      summary: Удаление багажа
+            $ref: '#/definitions/model.Group'
+      summary: Получение группы по ID
       tags:
-      - Багаж
-  /baggage/{baggage_id}/delivery:
+      - Группа
+  /group/{group_id}/delete:
+    delete:
+      description: Удаляет группу по ее ID
+      parameters:
+      - description: ID группы
+        in: path
+        name: group_id
+        required: true
+        type: integer
+      - description: Код группы
+        format: email
+        in: query
+        name: groupCode
+        type: string
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список групп
+          schema:
+            $ref: '#/definitions/model.GroupsGetResponse'
+        "400":
+          description: Некорректный запрос
+          schema:
+            $ref: '#/definitions/model.GroupsGetResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/model.GroupsGetResponse'
+      summary: Удаление группы
+      tags:
+      - Группа
+  /group/{group_id}/feedback:
     post:
-      description: Добавляет багаж к доставке по его ID
+      description: Добавляет группу к опросу по ее ID
       parameters:
-      - description: ID багажа
+      - description: ID группы
         in: path
-        name: baggage_id
+        name: group_id
         required: true
         type: integer
-      - description: Код багажа
+      - description: Код группы
         format: email
         in: query
-        name: searchCode
+        name: groupCode
         type: string
       produces:
       - application/json
       responses:
         "200":
-          description: Список багажей
+          description: Список групп
           schema:
-            $ref: '#/definitions/model.BaggagesGetResponse'
+            $ref: '#/definitions/model.GroupsGetResponse'
         "400":
           description: Некорректный запрос
           schema:
-            $ref: '#/definitions/model.BaggagesGetResponse'
+            $ref: '#/definitions/model.GroupsGetResponse'
         "500":
           description: Внутренняя ошибка сервера
           schema:
-            $ref: '#/definitions/model.BaggagesGetResponse'
-      summary: Добавление багажа к доставке
+            $ref: '#/definitions/model.GroupsGetResponse'
+      summary: Добавление группы к опросу
       tags:
-      - Багаж
-  /baggage/{baggage_id}/image:
+      - Группа
+  /group/{group_id}/image:
     post:
       consumes:
       - multipart/form-data
-      description: Добавляет изображение к багажу по его ID
+      description: Добавляет изображение к группе по его ID
       parameters:
-      - description: ID багажа
+      - description: ID группы
         in: path
-        name: baggage_id
+        name: group_id
         required: true
         type: integer
-      - description: Изображение багажа
+      - description: Изображение группы
         in: formData
         name: image
         required: true
@@ -228,313 +376,255 @@ paths:
         "200":
           description: OK
           schema:
-            $ref: '#/definitions/model.Baggage'
+            $ref: '#/definitions/model.Group'
         "400":
           description: Некорректный запрос
           schema:
-            $ref: '#/definitions/model.Baggage'
+            $ref: '#/definitions/model.Group'
         "500":
           description: Внутренняя ошибка сервера
           schema:
-            $ref: '#/definitions/model.Baggage'
-      summary: Добавление изображения к багажу
+            $ref: '#/definitions/model.Group'
+      summary: Добавление изображения к группе
       tags:
-      - Багаж
-  /baggage/{baggage_id}/update:
+      - Группа
+  /group/{group_id}/update:
     put:
       consumes:
       - application/json
-      description: Обновляет информацию о багаже по его ID
+      description: Обновляет информацию о группе по ее ID
       parameters:
-      - description: ID багажа
+      - description: ID группы
         in: path
-        name: baggage_id
+        name: group_id
         required: true
         type: integer
       produces:
       - application/json
       responses:
         "200":
-          description: Информация о багаже
+          description: Информация о группе
           schema:
-            $ref: '#/definitions/model.Baggage'
+            $ref: '#/definitions/model.Group'
         "400":
           description: Некорректный запрос
           schema:
-            $ref: '#/definitions/model.Baggage'
+            $ref: '#/definitions/model.Group'
         "500":
           description: Внутренняя ошибка сервера
           schema:
-            $ref: '#/definitions/model.Baggage'
-      summary: Обновление информации о багаже
+            $ref: '#/definitions/model.Group'
+      summary: Обновление информации о группе
       tags:
-      - Багаж
-  /baggage/create:
+      - Группа
+  /group/create:
     post:
       consumes:
       - application/json
-      description: Создает новый багаж с предоставленными данными
+      description: Создает новую группу с предоставленными данными
       parameters:
-      - description: Код багажа
+      - description: Код группы
         format: email
         in: query
-        name: searchCode
+        name: groupCode
         type: string
       produces:
       - application/json
       responses:
         "200":
-          description: Список багажей
+          description: Список групп
           schema:
-            $ref: '#/definitions/model.BaggagesGetResponse'
+            $ref: '#/definitions/model.GroupsGetResponse'
         "400":
           description: Некорректный запрос
           schema:
-            $ref: '#/definitions/model.BaggagesGetResponse'
+            $ref: '#/definitions/model.GroupsGetResponse'
         "500":
           description: Внутренняя ошибка сервера
           schema:
-            $ref: '#/definitions/model.BaggagesGetResponse'
-      summary: Создание нового багажа
+            $ref: '#/definitions/model.GroupsGetResponse'
+      summary: Создание новой группы
       tags:
-      - Багаж
-  /baggages/{baggage_id}/delivery:
+      - Группа
+  /group/paginate:
+    get:
+      description: Возвращает список всех активных групп с использованием пагинации
+      parameters:
+      - description: Код группы
+        format: email
+        in: query
+        name: groupCode
+        type: string
+      - description: Номер страницы
+        format: email
+        in: query
+        name: page
+        type: integer
+      - description: Размер страницы
+        format: email
+        in: query
+        name: pageSize
+        type: integer
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Список групп
+          schema:
+            $ref: '#/definitions/model.GroupsGetResponse'
+        "400":
+          description: Некорректный запрос
+          schema:
+            $ref: '#/definitions/model.GroupsGetResponse'
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            $ref: '#/definitions/model.GroupsGetResponse'
+      summary: Получение списка групп с пагинацией
+      tags:
+      - Группа
+  /groups/{group_id}/feedback:
     post:
-      description: Удаляет багаж из доставки по его ID
+      description: Удаляет группу из опроса по ее ID
       parameters:
-      - description: ID багажа
+      - description: ID группы
         in: path
-        name: baggage_id
+        name: group_id
         required: true
         type: integer
-      - description: Код багажа
+      - description: Код группы
         format: email
         in: query
-        name: searchCode
+        name: groupCode
         type: string
       produces:
       - application/json
       responses:
         "200":
-          description: Список багажей
+          description: Список групп
           schema:
-            $ref: '#/definitions/model.BaggagesGetResponse'
+            $ref: '#/definitions/model.GroupsGetResponse'
         "400":
           description: Некорректный запрос
           schema:
-            $ref: '#/definitions/model.BaggagesGetResponse'
+            $ref: '#/definitions/model.GroupsGetResponse'
         "500":
           description: Внутренняя ошибка сервера
           schema:
-            $ref: '#/definitions/model.BaggagesGetResponse'
-      summary: Удаление багажа из доставки
+            $ref: '#/definitions/model.GroupsGetResponse'
+      summary: Удаление группы из опроса
       tags:
-      - Багаж
-  /delivery:
+      - Группа
+  /user/:
     get:
-      description: Возвращает список всех не удаленных доставок
-      parameters:
-      - description: Номер рейса
-        format: email
-        in: query
-        name: searchFlightNumber
-        type: string
-      - description: Начало даты формирования
-        format: email
-        in: query
-        name: startFormationDate
-        type: string
-      - description: Конец даты формирования
-        format: email
-        in: query
-        name: endFormationDate
-        type: string
-      - description: Статус доставки
-        format: email
-        in: query
-        name: deliveryStatus
-        type: string
+      description: Получение данных пользователя по его идентификатору
       produces:
       - application/json
       responses:
         "200":
-          description: Список багажей
+          description: Успешный ответ
           schema:
-            $ref: '#/definitions/model.DeliveryRequest'
-        "500":
-          description: Ошибка сервера
-          schema:
-            $ref: '#/definitions/model.DeliveryRequest'
-      summary: Получение списка доставок
-      tags:
-      - Доставка
-  /delivery/{id}:
-    get:
-      description: Возвращает информацию о доставке по её идентификатору
-      parameters:
-      - description: Идентификатор доставки
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Информация о доставке
-          schema:
-            $ref: '#/definitions/model.DeliveryGetResponse'
+            items:
+              $ref: '#/definitions/model.User'
+            type: array
         "400":
-          description: Недопустимый идентификатор доставки
+          description: Неверный запрос
           schema:
-            $ref: '#/definitions/model.DeliveryGetResponse'
+            additionalProperties:
+              type: string
+            type: object
         "500":
-          description: Ошибка сервера
+          description: Внутренняя ошибка сервера
           schema:
-            $ref: '#/definitions/model.DeliveryGetResponse'
-      summary: Получение доставки по идентификатору
-      tags:
-      - Доставка
-  /delivery/{id}/delete:
-    delete:
-      description: Удаляет доставку по её идентификатору
-      parameters:
-      - description: Идентификатор доставки
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: Номер рейса
-        format: email
-        in: query
-        name: searchFlightNumber
-        type: string
-      - description: Начало даты формирования
-        format: email
-        in: query
-        name: startFormationDate
-        type: string
-      - description: Конец даты формирования
-        format: email
-        in: query
-        name: endFormationDate
-        type: string
-      - description: Статус доставки
-        format: email
-        in: query
-        name: deliveryStatus
-        type: string
-      produces:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Получить пользователя по идентификатору
+  /user/login:
+    post:
+      consumes:
       - application/json
-      responses:
-        "200":
-          description: Список багажей
-          schema:
-            $ref: '#/definitions/model.DeliveryRequest'
-        "400":
-          description: Недопустимый идентификатор доставки
-          schema:
-            $ref: '#/definitions/model.DeliveryRequest'
-        "500":
-          description: Ошибка сервера
-          schema:
-            $ref: '#/definitions/model.DeliveryRequest'
-      summary: Удаление доставки
-      tags:
-      - Доставка
-  /delivery/{id}/status:
-    put:
-      description: Обновляет статус доставки для модератора по идентификатору доставки
+      description: Авторизация пользователя и генерация JWT-токена
       parameters:
-      - description: Идентификатор доставки
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: Новый статус доставки
+      - description: Данные для входа
         in: body
-        name: deliveryStatus
+        name: body
         required: true
         schema:
-          $ref: '#/definitions/model.DeliveryUpdateStatusRequest'
+          $ref: '#/definitions/model.UserLoginRequest'
       produces:
       - application/json
       responses:
         "200":
-          description: Информация о доставке
+          description: Успешный ответ
           schema:
-            $ref: '#/definitions/model.DeliveryGetResponse'
+            additionalProperties:
+              type: string
+            type: object
         "400":
-          description: Недопустимый идентификатор доставки или ошибка чтения JSON
-            объекта
+          description: Неверный запрос
           schema:
-            $ref: '#/definitions/model.DeliveryGetResponse'
+            additionalProperties:
+              type: string
+            type: object
         "500":
-          description: Ошибка сервера
+          description: Внутренняя ошибка сервера
           schema:
-            $ref: '#/definitions/model.DeliveryGetResponse'
-      summary: Обновление статуса доставки для модератора
+            additionalProperties:
+              type: string
+            type: object
+      summary: Вход пользователя
       tags:
-      - Доставка
-  /delivery/{id}/update:
-    put:
-      description: Обновляет номер рейса для доставки по её идентификатору
+      - Пользователь
+  /user/logout:
+    post:
+      description: Выход пользователя из системы и удаление токена из куков
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Успешный ответ
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "400":
+          description: Неверный запрос
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+        "500":
+          description: Внутренняя ошибка сервера
+          schema:
+            additionalProperties:
+              type: string
+            type: object
+      summary: Выход пользователя
+      tags:
+      - Пользователь
+  /user/register:
+    post:
+      consumes:
+      - application/json
+      description: Регистрация нового пользователя с предоставленной информацией.
       parameters:
-      - description: Идентификатор доставки
-        in: path
-        name: id
-        required: true
-        type: integer
-      - description: Новый номер рейса
+      - description: Пользовательский объект в формате JSON
         in: body
-        name: flightNumber
+        name: user
         required: true
         schema:
-          $ref: '#/definitions/model.DeliveryUpdateFlightNumberRequest'
+          $ref: '#/definitions/model.UserRegisterRequest'
       produces:
       - application/json
       responses:
-        "200":
-          description: Информация о доставке
+        "201":
+          description: Успешно зарегистрированный пользователь
           schema:
-            $ref: '#/definitions/model.DeliveryGetResponse'
-        "400":
-          description: Недопустимый идентификатор доставки или ошибка чтения JSON
-            объекта
-          schema:
-            $ref: '#/definitions/model.DeliveryGetResponse'
-        "500":
-          description: Ошибка сервера
-          schema:
-            $ref: '#/definitions/model.DeliveryGetResponse'
-      summary: Обновление номера рейса доставки
+            items:
+              $ref: '#/definitions/model.User'
+            type: array
+      summary: Регистрация нового пользователя.
       tags:
-      - Доставка
-  /delivery/{id}/user:
-    put:
-      description: Обновляет статус доставки для пользователя по идентификатору доставки
-      parameters:
-      - description: Идентификатор доставки
-        in: path
-        name: id
-        required: true
-        type: integer
-      produces:
-      - application/json
-      responses:
-        "200":
-          description: Информация о доставке
-          schema:
-            $ref: '#/definitions/model.DeliveryGetResponse'
-        "400":
-          description: Недопустимый идентификатор доставки
-          schema:
-            $ref: '#/definitions/model.DeliveryGetResponse'
-        "500":
-          description: Ошибка сервера
-          schema:
-            $ref: '#/definitions/model.DeliveryGetResponse'
-      summary: Обновление статуса доставки для пользователя
-      tags:
-      - Доставка
+      - Пользователь
 swagger: "2.0"

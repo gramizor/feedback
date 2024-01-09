@@ -5,6 +5,7 @@ import (
 	"log"
 
 	"rest-apishka/docs"
+	"rest-apishka/internal/pkg/middleware"
 
 	"github.com/gin-gonic/gin"
 	swaggerFiles "github.com/swaggo/files"     // swagger embed files
@@ -24,19 +25,19 @@ func (app *Application) Run() {
 	// Группа запросов для группы
 	GroupGroup := r.Group("/group")
 	{
-		GroupGroup.GET("/", app.Handler.GetGroups)
-		GroupGroup.GET("/paginate", app.Handler.GetGroupsPaged)
-		GroupGroup.GET("/:group_id", app.Handler.GetGroupByID)
-		GroupGroup.DELETE("/:group_id/delete", app.Handler.DeleteGroup)
-		GroupGroup.POST("/create", app.Handler.CreateGroup)
-		GroupGroup.PUT("/:group_id/update", app.Handler.UpdateGroup)
-		GroupGroup.POST("/:group_id/feedback", app.Handler.AddGroupToFeedback)
-		GroupGroup.DELETE("/:group_id/feedback/delete", app.Handler.RemoveGroupFromFeedback)
-		GroupGroup.POST("/:group_id/image", app.Handler.AddGroupImage)
+		GroupGroup.GET("/", middleware.Guest(app.Repository.GetRedisClient(), []byte("AccessSecretKey"), app.Repository), app.Handler.GetGroups)
+		GroupGroup.GET("/paginate", middleware.Guest(app.Repository.GetRedisClient(), []byte("AccessSecretKey"), app.Repository), app.Handler.GetGroupsPaged)
+		GroupGroup.GET("/:group", middleware.Guest(app.Repository.GetRedisClient(), []byte("AccessSecretKey"), app.Repository), app.Handler.GetGroupByID)
+		GroupGroup.DELETE("/:group/delete", middleware.Authenticate(app.Repository.GetRedisClient(), []byte("AccessSecretKey"), app.Repository), app.Handler.DeleteGroup)
+		GroupGroup.POST("/create", middleware.Authenticate(app.Repository.GetRedisClient(), []byte("AccessSecretKey"), app.Repository), app.Handler.CreateGroup)
+		GroupGroup.PUT("/:group/update", middleware.Authenticate(app.Repository.GetRedisClient(), []byte("AccessSecretKey"), app.Repository), app.Handler.UpdateGroup)
+		GroupGroup.POST("/:group/feedback", middleware.Authenticate(app.Repository.GetRedisClient(), []byte("AccessSecretKey"), app.Repository), app.Handler.AddGroupToFeedback)
+		GroupGroup.DELETE("/:group/feedback/delete", middleware.Authenticate(app.Repository.GetRedisClient(), []byte("AccessSecretKey"), app.Repository), app.Handler.RemoveGroupFromFeedback)
+		GroupGroup.POST("/:group/image", middleware.Authenticate(app.Repository.GetRedisClient(), []byte("AccessSecretKey"), app.Repository), app.Handler.AddGroupImage)
 	}
 
 	// Группа запросов для опроса
-	FeedbackGroup := r.Group("/feedback")
+	FeedbackGroup := r.Group("/feedback").Use(middleware.Authenticate(app.Repository.GetRedisClient(), []byte("AccessSecretKey"), app.Repository))
 	{
 		FeedbackGroup.GET("/", app.Handler.GetFeedbacks)
 		FeedbackGroup.GET("/:id", app.Handler.GetFeedbackByID)
@@ -45,6 +46,13 @@ func (app *Application) Run() {
 		FeedbackGroup.PUT("/:id/status/moderator", app.Handler.UpdateFeedbackStatusModerator) // Новый маршрут для обновления статуса опроса модератором
 	}
 
+	UserGroup := r.Group("/user")
+	{
+		UserGroup.GET("/", app.Handler.GetUserByID)
+		UserGroup.POST("/registration", app.Handler.Register)
+		UserGroup.POST("/login", app.Handler.Login)
+		UserGroup.POST("/logout", middleware.Authenticate(app.Repository.GetRedisClient(), []byte("AccessSecretKey"), app.Repository), app.Handler.Logout)
+	}
 	addr := fmt.Sprintf("%s:%d", app.Config.ServiceHost, app.Config.ServicePort)
 	r.Run(addr)
 	log.Println("Server down")

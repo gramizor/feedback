@@ -15,44 +15,238 @@ const docTemplate = `{
     "host": "{{.Host}}",
     "basePath": "{{.BasePath}}",
     "paths": {
-        "/baggage": {
+        "/feedback/{id}": {
             "get": {
-                "description": "Возращает список всех активных багажей",
+                "description": "Возвращает информацию об опросе по её идентификатору",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Багаж"
+                    "Опрос"
                 ],
-                "summary": "Получение списка багажа",
+                "summary": "Получение опроса по идентификатору",
                 "parameters": [
                     {
-                        "type": "string",
-                        "format": "email",
-                        "description": "Код багажа",
-                        "name": "searchCode",
-                        "in": "query"
+                        "type": "integer",
+                        "description": "Идентификатор опроса",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Список багажей",
+                        "description": "Информация об опросе",
                         "schema": {
-                            "$ref": "#/definitions/model.BaggagesGetResponse"
+                            "$ref": "#/definitions/model.FeedbackGetResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Недопустимый идентификатор опроса",
+                        "schema": {
+                            "$ref": "#/definitions/model.FeedbackGetResponse"
                         }
                     },
                     "500": {
                         "description": "Ошибка сервера",
                         "schema": {
-                            "$ref": "#/definitions/model.BaggagesGetResponse"
+                            "$ref": "#/definitions/model.FeedbackGetResponse"
                         }
                     }
                 }
             }
         },
-        "/baggage/create": {
+        "/feedback/{id}/delete": {
+            "delete": {
+                "description": "Удаляет опрос по её идентификатору",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Опрос"
+                ],
+                "summary": "Удаление опроса",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Идентификатор опроса",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "type": "string",
+                        "format": "email",
+                        "description": "Начало даты формирования",
+                        "name": "startFormationDate",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "email",
+                        "description": "Конец даты формирования",
+                        "name": "endFormationDate",
+                        "in": "query"
+                    },
+                    {
+                        "type": "string",
+                        "format": "email",
+                        "description": "Статус опроса",
+                        "name": "feedbackStatus",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Список групп",
+                        "schema": {
+                            "$ref": "#/definitions/model.FeedbackRequest"
+                        }
+                    },
+                    "400": {
+                        "description": "Недопустимый идентификатор опроса",
+                        "schema": {
+                            "$ref": "#/definitions/model.FeedbackRequest"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/model.FeedbackRequest"
+                        }
+                    }
+                }
+            }
+        },
+        "/feedback/{id}/status": {
+            "put": {
+                "description": "Обновляет статус опроса для модератора по идентификатору опроса",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Опрос"
+                ],
+                "summary": "Обновление статуса опроса для модератора",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Идентификатор опроса",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    },
+                    {
+                        "description": "Новый статус опроса",
+                        "name": "feedbackStatus",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/model.FeedbackUpdateStatusRequest"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Информация о доставке",
+                        "schema": {
+                            "$ref": "#/definitions/model.FeedbackGetResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Недопустимый идентификатор опроса или ошибка чтения JSON объекта",
+                        "schema": {
+                            "$ref": "#/definitions/model.FeedbackGetResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/model.FeedbackGetResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/feedback/{id}/user": {
+            "put": {
+                "description": "Обновляет статус опроса для пользователя по идентификатору опроса",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Опрос"
+                ],
+                "summary": "Обновление статуса опроса для пользователя",
+                "parameters": [
+                    {
+                        "type": "integer",
+                        "description": "Идентификатор опроса",
+                        "name": "id",
+                        "in": "path",
+                        "required": true
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Информация о доставке",
+                        "schema": {
+                            "$ref": "#/definitions/model.FeedbackGetResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Недопустимый идентификатор опроса",
+                        "schema": {
+                            "$ref": "#/definitions/model.FeedbackGetResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/model.FeedbackGetResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/group": {
+            "get": {
+                "description": "Возращает список всех активных групп",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Группа"
+                ],
+                "summary": "Получение списка групп",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "email",
+                        "description": "Код группы",
+                        "name": "groupCode",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Список групп",
+                        "schema": {
+                            "$ref": "#/definitions/model.GroupsGetResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/model.GroupsGetResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/group/create": {
             "post": {
-                "description": "Создает новый багаж с предоставленными данными",
+                "description": "Создает новую группу с предоставленными данными",
                 "consumes": [
                     "application/json"
                 ],
@@ -60,180 +254,235 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Багаж"
+                    "Группа"
                 ],
-                "summary": "Создание нового багажа",
+                "summary": "Создание новой группы",
                 "parameters": [
                     {
                         "type": "string",
                         "format": "email",
-                        "description": "Код багажа",
-                        "name": "searchCode",
+                        "description": "Код группы",
+                        "name": "groupCode",
                         "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Список багажей",
+                        "description": "Список групп",
                         "schema": {
-                            "$ref": "#/definitions/model.BaggagesGetResponse"
+                            "$ref": "#/definitions/model.GroupsGetResponse"
                         }
                     },
                     "400": {
                         "description": "Некорректный запрос",
                         "schema": {
-                            "$ref": "#/definitions/model.BaggagesGetResponse"
+                            "$ref": "#/definitions/model.GroupsGetResponse"
                         }
                     },
                     "500": {
                         "description": "Внутренняя ошибка сервера",
                         "schema": {
-                            "$ref": "#/definitions/model.BaggagesGetResponse"
+                            "$ref": "#/definitions/model.GroupsGetResponse"
                         }
                     }
                 }
             }
         },
-        "/baggage/{baggage_id}": {
+        "/group/paginate": {
             "get": {
-                "description": "Возвращает информацию о багаже по его ID",
+                "description": "Возвращает список всех активных групп с использованием пагинации",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Багаж"
+                    "Группа"
                 ],
-                "summary": "Получение багажа по ID",
+                "summary": "Получение списка групп с пагинацией",
+                "parameters": [
+                    {
+                        "type": "string",
+                        "format": "email",
+                        "description": "Код группы",
+                        "name": "groupCode",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "format": "email",
+                        "description": "Номер страницы",
+                        "name": "page",
+                        "in": "query"
+                    },
+                    {
+                        "type": "integer",
+                        "format": "email",
+                        "description": "Размер страницы",
+                        "name": "pageSize",
+                        "in": "query"
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "Список групп",
+                        "schema": {
+                            "$ref": "#/definitions/model.GroupsGetResponse"
+                        }
+                    },
+                    "400": {
+                        "description": "Некорректный запрос",
+                        "schema": {
+                            "$ref": "#/definitions/model.GroupsGetResponse"
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
+                        "schema": {
+                            "$ref": "#/definitions/model.GroupsGetResponse"
+                        }
+                    }
+                }
+            }
+        },
+        "/group/{group_id}": {
+            "get": {
+                "description": "Возвращает информацию о группе по его ID",
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Группа"
+                ],
+                "summary": "Получение группы по ID",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "ID багажа",
-                        "name": "baggage_id",
+                        "description": "ID группы",
+                        "name": "group_id",
                         "in": "path",
                         "required": true
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Информация о багаже",
+                        "description": "Информация о группе",
                         "schema": {
-                            "$ref": "#/definitions/model.Baggage"
+                            "$ref": "#/definitions/model.Group"
                         }
                     },
                     "400": {
                         "description": "Некорректный запрос",
                         "schema": {
-                            "$ref": "#/definitions/model.Baggage"
+                            "$ref": "#/definitions/model.Group"
                         }
                     },
                     "500": {
                         "description": "Внутренняя ошибка сервера",
                         "schema": {
-                            "$ref": "#/definitions/model.Baggage"
+                            "$ref": "#/definitions/model.Group"
                         }
                     }
                 }
             }
         },
-        "/baggage/{baggage_id}/delete": {
+        "/group/{group_id}/delete": {
             "delete": {
-                "description": "Удаляет багаж по его ID",
+                "description": "Удаляет группу по ее ID",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Багаж"
+                    "Группа"
                 ],
-                "summary": "Удаление багажа",
+                "summary": "Удаление группы",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "ID багажа",
-                        "name": "baggage_id",
+                        "description": "ID группы",
+                        "name": "group_id",
                         "in": "path",
                         "required": true
                     },
                     {
                         "type": "string",
                         "format": "email",
-                        "description": "Код багажа",
-                        "name": "searchCode",
+                        "description": "Код группы",
+                        "name": "groupCode",
                         "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Список багажей",
+                        "description": "Список групп",
                         "schema": {
-                            "$ref": "#/definitions/model.BaggagesGetResponse"
+                            "$ref": "#/definitions/model.GroupsGetResponse"
                         }
                     },
                     "400": {
                         "description": "Некорректный запрос",
                         "schema": {
-                            "$ref": "#/definitions/model.BaggagesGetResponse"
+                            "$ref": "#/definitions/model.GroupsGetResponse"
                         }
                     },
                     "500": {
                         "description": "Внутренняя ошибка сервера",
                         "schema": {
-                            "$ref": "#/definitions/model.BaggagesGetResponse"
+                            "$ref": "#/definitions/model.GroupsGetResponse"
                         }
                     }
                 }
             }
         },
-        "/baggage/{baggage_id}/delivery": {
+        "/group/{group_id}/feedback": {
             "post": {
-                "description": "Добавляет багаж к доставке по его ID",
+                "description": "Добавляет группу к опросу по ее ID",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Багаж"
+                    "Группа"
                 ],
-                "summary": "Добавление багажа к доставке",
+                "summary": "Добавление группы к опросу",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "ID багажа",
-                        "name": "baggage_id",
+                        "description": "ID группы",
+                        "name": "group_id",
                         "in": "path",
                         "required": true
                     },
                     {
                         "type": "string",
                         "format": "email",
-                        "description": "Код багажа",
-                        "name": "searchCode",
+                        "description": "Код группы",
+                        "name": "groupCode",
                         "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Список багажей",
+                        "description": "Список групп",
                         "schema": {
-                            "$ref": "#/definitions/model.BaggagesGetResponse"
+                            "$ref": "#/definitions/model.GroupsGetResponse"
                         }
                     },
                     "400": {
                         "description": "Некорректный запрос",
                         "schema": {
-                            "$ref": "#/definitions/model.BaggagesGetResponse"
+                            "$ref": "#/definitions/model.GroupsGetResponse"
                         }
                     },
                     "500": {
                         "description": "Внутренняя ошибка сервера",
                         "schema": {
-                            "$ref": "#/definitions/model.BaggagesGetResponse"
+                            "$ref": "#/definitions/model.GroupsGetResponse"
                         }
                     }
                 }
             }
         },
-        "/baggage/{baggage_id}/image": {
+        "/group/{group_id}/image": {
             "post": {
-                "description": "Добавляет изображение к багажу по его ID",
+                "description": "Добавляет изображение к группе по его ID",
                 "consumes": [
                     "multipart/form-data"
                 ],
@@ -241,20 +490,20 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Багаж"
+                    "Группа"
                 ],
-                "summary": "Добавление изображения к багажу",
+                "summary": "Добавление изображения к группе",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "ID багажа",
-                        "name": "baggage_id",
+                        "description": "ID группы",
+                        "name": "group_id",
                         "in": "path",
                         "required": true
                     },
                     {
                         "type": "file",
-                        "description": "Изображение багажа",
+                        "description": "Изображение группы",
                         "name": "image",
                         "in": "formData",
                         "required": true
@@ -264,27 +513,27 @@ const docTemplate = `{
                     "200": {
                         "description": "OK",
                         "schema": {
-                            "$ref": "#/definitions/model.Baggage"
+                            "$ref": "#/definitions/model.Group"
                         }
                     },
                     "400": {
                         "description": "Некорректный запрос",
                         "schema": {
-                            "$ref": "#/definitions/model.Baggage"
+                            "$ref": "#/definitions/model.Group"
                         }
                     },
                     "500": {
                         "description": "Внутренняя ошибка сервера",
                         "schema": {
-                            "$ref": "#/definitions/model.Baggage"
+                            "$ref": "#/definitions/model.Group"
                         }
                     }
                 }
             }
         },
-        "/baggage/{baggage_id}/update": {
+        "/group/{group_id}/update": {
             "put": {
-                "description": "Обновляет информацию о багаже по его ID",
+                "description": "Обновляет информацию о группе по ее ID",
                 "consumes": [
                     "application/json"
                 ],
@@ -292,390 +541,254 @@ const docTemplate = `{
                     "application/json"
                 ],
                 "tags": [
-                    "Багаж"
+                    "Группа"
                 ],
-                "summary": "Обновление информации о багаже",
+                "summary": "Обновление информации о группе",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "ID багажа",
-                        "name": "baggage_id",
+                        "description": "ID группы",
+                        "name": "group_id",
                         "in": "path",
                         "required": true
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Информация о багаже",
+                        "description": "Информация о группе",
                         "schema": {
-                            "$ref": "#/definitions/model.Baggage"
+                            "$ref": "#/definitions/model.Group"
                         }
                     },
                     "400": {
                         "description": "Некорректный запрос",
                         "schema": {
-                            "$ref": "#/definitions/model.Baggage"
+                            "$ref": "#/definitions/model.Group"
                         }
                     },
                     "500": {
                         "description": "Внутренняя ошибка сервера",
                         "schema": {
-                            "$ref": "#/definitions/model.Baggage"
+                            "$ref": "#/definitions/model.Group"
                         }
                     }
                 }
             }
         },
-        "/baggages/{baggage_id}/delivery": {
+        "/groups/{group_id}/feedback": {
             "post": {
-                "description": "Удаляет багаж из доставки по его ID",
+                "description": "Удаляет группу из опроса по ее ID",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Багаж"
+                    "Группа"
                 ],
-                "summary": "Удаление багажа из доставки",
+                "summary": "Удаление группы из опроса",
                 "parameters": [
                     {
                         "type": "integer",
-                        "description": "ID багажа",
-                        "name": "baggage_id",
+                        "description": "ID группы",
+                        "name": "group_id",
                         "in": "path",
                         "required": true
                     },
                     {
                         "type": "string",
                         "format": "email",
-                        "description": "Код багажа",
-                        "name": "searchCode",
+                        "description": "Код группы",
+                        "name": "groupCode",
                         "in": "query"
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Список багажей",
+                        "description": "Список групп",
                         "schema": {
-                            "$ref": "#/definitions/model.BaggagesGetResponse"
+                            "$ref": "#/definitions/model.GroupsGetResponse"
                         }
                     },
                     "400": {
                         "description": "Некорректный запрос",
                         "schema": {
-                            "$ref": "#/definitions/model.BaggagesGetResponse"
+                            "$ref": "#/definitions/model.GroupsGetResponse"
                         }
                     },
                     "500": {
                         "description": "Внутренняя ошибка сервера",
                         "schema": {
-                            "$ref": "#/definitions/model.BaggagesGetResponse"
+                            "$ref": "#/definitions/model.GroupsGetResponse"
                         }
                     }
                 }
             }
         },
-        "/delivery": {
+        "/user/": {
             "get": {
-                "description": "Возвращает список всех не удаленных доставок",
+                "description": "Получение данных пользователя по его идентификатору",
                 "produces": [
                     "application/json"
                 ],
-                "tags": [
-                    "Доставка"
-                ],
-                "summary": "Получение списка доставок",
-                "parameters": [
-                    {
-                        "type": "string",
-                        "format": "email",
-                        "description": "Номер рейса",
-                        "name": "searchFlightNumber",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "format": "email",
-                        "description": "Начало даты формирования",
-                        "name": "startFormationDate",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "format": "email",
-                        "description": "Конец даты формирования",
-                        "name": "endFormationDate",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "format": "email",
-                        "description": "Статус доставки",
-                        "name": "deliveryStatus",
-                        "in": "query"
-                    }
-                ],
+                "summary": "Получить пользователя по идентификатору",
                 "responses": {
                     "200": {
-                        "description": "Список багажей",
+                        "description": "Успешный ответ",
                         "schema": {
-                            "$ref": "#/definitions/model.DeliveryRequest"
-                        }
-                    },
-                    "500": {
-                        "description": "Ошибка сервера",
-                        "schema": {
-                            "$ref": "#/definitions/model.DeliveryRequest"
-                        }
-                    }
-                }
-            }
-        },
-        "/delivery/{id}": {
-            "get": {
-                "description": "Возвращает информацию о доставке по её идентификатору",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Доставка"
-                ],
-                "summary": "Получение доставки по идентификатору",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Идентификатор доставки",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Информация о доставке",
-                        "schema": {
-                            "$ref": "#/definitions/model.DeliveryGetResponse"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.User"
+                            }
                         }
                     },
                     "400": {
-                        "description": "Недопустимый идентификатор доставки",
+                        "description": "Неверный запрос",
                         "schema": {
-                            "$ref": "#/definitions/model.DeliveryGetResponse"
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
                         }
                     },
                     "500": {
-                        "description": "Ошибка сервера",
+                        "description": "Внутренняя ошибка сервера",
                         "schema": {
-                            "$ref": "#/definitions/model.DeliveryGetResponse"
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
                         }
                     }
                 }
             }
         },
-        "/delivery/{id}/delete": {
-            "delete": {
-                "description": "Удаляет доставку по её идентификатору",
+        "/user/login": {
+            "post": {
+                "description": "Авторизация пользователя и генерация JWT-токена",
+                "consumes": [
+                    "application/json"
+                ],
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Доставка"
+                    "Пользователь"
                 ],
-                "summary": "Удаление доставки",
+                "summary": "Вход пользователя",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "Идентификатор доставки",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "type": "string",
-                        "format": "email",
-                        "description": "Номер рейса",
-                        "name": "searchFlightNumber",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "format": "email",
-                        "description": "Начало даты формирования",
-                        "name": "startFormationDate",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "format": "email",
-                        "description": "Конец даты формирования",
-                        "name": "endFormationDate",
-                        "in": "query"
-                    },
-                    {
-                        "type": "string",
-                        "format": "email",
-                        "description": "Статус доставки",
-                        "name": "deliveryStatus",
-                        "in": "query"
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Список багажей",
-                        "schema": {
-                            "$ref": "#/definitions/model.DeliveryRequest"
-                        }
-                    },
-                    "400": {
-                        "description": "Недопустимый идентификатор доставки",
-                        "schema": {
-                            "$ref": "#/definitions/model.DeliveryRequest"
-                        }
-                    },
-                    "500": {
-                        "description": "Ошибка сервера",
-                        "schema": {
-                            "$ref": "#/definitions/model.DeliveryRequest"
-                        }
-                    }
-                }
-            }
-        },
-        "/delivery/{id}/status": {
-            "put": {
-                "description": "Обновляет статус доставки для модератора по идентификатору доставки",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Доставка"
-                ],
-                "summary": "Обновление статуса доставки для модератора",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Идентификатор доставки",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Новый статус доставки",
-                        "name": "deliveryStatus",
+                        "description": "Данные для входа",
+                        "name": "body",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.DeliveryUpdateStatusRequest"
+                            "$ref": "#/definitions/model.UserLoginRequest"
                         }
                     }
                 ],
                 "responses": {
                     "200": {
-                        "description": "Информация о доставке",
+                        "description": "Успешный ответ",
                         "schema": {
-                            "$ref": "#/definitions/model.DeliveryGetResponse"
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
                         }
                     },
                     "400": {
-                        "description": "Недопустимый идентификатор доставки или ошибка чтения JSON объекта",
+                        "description": "Неверный запрос",
                         "schema": {
-                            "$ref": "#/definitions/model.DeliveryGetResponse"
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
                         }
                     },
                     "500": {
-                        "description": "Ошибка сервера",
+                        "description": "Внутренняя ошибка сервера",
                         "schema": {
-                            "$ref": "#/definitions/model.DeliveryGetResponse"
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
                         }
                     }
                 }
             }
         },
-        "/delivery/{id}/update": {
-            "put": {
-                "description": "Обновляет номер рейса для доставки по её идентификатору",
+        "/user/logout": {
+            "post": {
+                "description": "Выход пользователя из системы и удаление токена из куков",
                 "produces": [
                     "application/json"
                 ],
                 "tags": [
-                    "Доставка"
+                    "Пользователь"
                 ],
-                "summary": "Обновление номера рейса доставки",
+                "summary": "Выход пользователя",
+                "responses": {
+                    "200": {
+                        "description": "Успешный ответ",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "400": {
+                        "description": "Неверный запрос",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    },
+                    "500": {
+                        "description": "Внутренняя ошибка сервера",
+                        "schema": {
+                            "type": "object",
+                            "additionalProperties": {
+                                "type": "string"
+                            }
+                        }
+                    }
+                }
+            }
+        },
+        "/user/register": {
+            "post": {
+                "description": "Регистрация нового пользователя с предоставленной информацией.",
+                "consumes": [
+                    "application/json"
+                ],
+                "produces": [
+                    "application/json"
+                ],
+                "tags": [
+                    "Пользователь"
+                ],
+                "summary": "Регистрация нового пользователя.",
                 "parameters": [
                     {
-                        "type": "integer",
-                        "description": "Идентификатор доставки",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    },
-                    {
-                        "description": "Новый номер рейса",
-                        "name": "flightNumber",
+                        "description": "Пользовательский объект в формате JSON",
+                        "name": "user",
                         "in": "body",
                         "required": true,
                         "schema": {
-                            "$ref": "#/definitions/model.DeliveryUpdateFlightNumberRequest"
+                            "$ref": "#/definitions/model.UserRegisterRequest"
                         }
                     }
                 ],
                 "responses": {
-                    "200": {
-                        "description": "Информация о доставке",
+                    "201": {
+                        "description": "Успешно зарегистрированный пользователь",
                         "schema": {
-                            "$ref": "#/definitions/model.DeliveryGetResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Недопустимый идентификатор доставки или ошибка чтения JSON объекта",
-                        "schema": {
-                            "$ref": "#/definitions/model.DeliveryGetResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Ошибка сервера",
-                        "schema": {
-                            "$ref": "#/definitions/model.DeliveryGetResponse"
-                        }
-                    }
-                }
-            }
-        },
-        "/delivery/{id}/user": {
-            "put": {
-                "description": "Обновляет статус доставки для пользователя по идентификатору доставки",
-                "produces": [
-                    "application/json"
-                ],
-                "tags": [
-                    "Доставка"
-                ],
-                "summary": "Обновление статуса доставки для пользователя",
-                "parameters": [
-                    {
-                        "type": "integer",
-                        "description": "Идентификатор доставки",
-                        "name": "id",
-                        "in": "path",
-                        "required": true
-                    }
-                ],
-                "responses": {
-                    "200": {
-                        "description": "Информация о доставке",
-                        "schema": {
-                            "$ref": "#/definitions/model.DeliveryGetResponse"
-                        }
-                    },
-                    "400": {
-                        "description": "Недопустимый идентификатор доставки",
-                        "schema": {
-                            "$ref": "#/definitions/model.DeliveryGetResponse"
-                        }
-                    },
-                    "500": {
-                        "description": "Ошибка сервера",
-                        "schema": {
-                            "$ref": "#/definitions/model.DeliveryGetResponse"
+                            "type": "array",
+                            "items": {
+                                "$ref": "#/definitions/model.User"
+                            }
                         }
                     }
                 }
@@ -683,135 +796,165 @@ const docTemplate = `{
         }
     },
     "definitions": {
-        "model.Baggage": {
+        "model.FeedbackGetResponse": {
             "type": "object",
             "properties": {
-                "airline": {
-                    "type": "string",
-                    "example": "AirlineX"
+                "completion_date": {
+                    "type": "string"
                 },
-                "baggage_code": {
-                    "type": "string",
-                    "example": "ABC123"
+                "creation_date": {
+                    "type": "string"
                 },
-                "baggage_id": {
+                "feedback_id": {
                     "type": "integer"
                 },
-                "baggage_status": {
-                    "type": "string",
-                    "example": "checked"
+                "feedback_status": {
+                    "type": "string"
                 },
-                "baggage_type": {
-                    "type": "string",
-                    "example": "suitcase"
+                "formation_date": {
+                    "type": "string"
                 },
-                "owner_name": {
-                    "type": "string",
-                    "example": "John Doe"
+                "full_name": {
+                    "type": "string"
                 },
-                "pasport_details": {
+                "groups": {
+                    "type": "array",
+                    "items": {
+                        "$ref": "#/definitions/model.Group"
+                    }
+                }
+            }
+        },
+        "model.FeedbackRequest": {
+            "type": "object",
+            "properties": {
+                "completion_date": {
+                    "type": "string"
+                },
+                "creation_date": {
+                    "type": "string"
+                },
+                "feedback_id": {
+                    "type": "integer"
+                },
+                "feedback_status": {
+                    "type": "string"
+                },
+                "formation_date": {
+                    "type": "string"
+                },
+                "full_name": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.FeedbackUpdateStatusRequest": {
+            "type": "object",
+            "properties": {
+                "feedback_status": {
+                    "type": "string"
+                }
+            }
+        },
+        "model.Group": {
+            "type": "object",
+            "properties": {
+                "contacts": {
                     "type": "string",
-                    "example": "123456789"
+                    "example": "+7(999)999-99-99"
+                },
+                "course": {
+                    "type": "integer",
+                    "example": 1
+                },
+                "group_code": {
+                    "type": "string",
+                    "example": "RT5-51B"
+                },
+                "group_id": {
+                    "type": "integer"
+                },
+                "group_status": {
+                    "type": "string",
+                    "example": "обучается"
                 },
                 "photo": {
                     "type": "string",
-                    "example": "http://example.com/baggage.jpg"
+                    "example": "http://example.com/group.jpg"
                 },
-                "size": {
-                    "type": "string",
-                    "example": "large"
-                },
-                "weight": {
-                    "type": "number",
-                    "example": 23.5
+                "students": {
+                    "type": "integer",
+                    "example": 23
                 }
             }
         },
-        "model.BaggagesGetResponse": {
+        "model.GroupsGetResponse": {
             "type": "object",
             "properties": {
-                "baggages": {
-                    "type": "array",
-                    "items": {
-                        "$ref": "#/definitions/model.Baggage"
-                    }
-                },
-                "delivery_id": {
+                "feedback_id": {
                     "type": "integer",
                     "example": 1
-                }
-            }
-        },
-        "model.DeliveryGetResponse": {
-            "type": "object",
-            "properties": {
-                "baggages": {
+                },
+                "groups": {
                     "type": "array",
                     "items": {
-                        "$ref": "#/definitions/model.Baggage"
+                        "$ref": "#/definitions/model.Group"
                     }
-                },
-                "completion_date": {
-                    "type": "string"
-                },
-                "creation_date": {
-                    "type": "string"
-                },
-                "delivery_id": {
-                    "type": "integer"
-                },
-                "delivery_status": {
-                    "type": "string"
-                },
-                "flight_number": {
-                    "type": "string"
-                },
-                "formation_date": {
+                }
+            }
+        },
+        "model.Role": {
+            "type": "string",
+            "enum": [
+                "пользователь",
+                "модератор"
+            ],
+            "x-enum-varnames": [
+                "UserRole",
+                "ModeratorRole"
+            ]
+        },
+        "model.User": {
+            "type": "object",
+            "properties": {
+                "email": {
                     "type": "string"
                 },
                 "full_name": {
                     "type": "string"
+                },
+                "password": {
+                    "type": "string"
+                },
+                "role": {
+                    "$ref": "#/definitions/model.Role"
+                },
+                "user_id": {
+                    "type": "integer"
                 }
             }
         },
-        "model.DeliveryRequest": {
+        "model.UserLoginRequest": {
             "type": "object",
             "properties": {
-                "completion_date": {
+                "email": {
                     "type": "string"
                 },
-                "creation_date": {
+                "password": {
                     "type": "string"
-                },
-                "delivery_id": {
-                    "type": "integer"
-                },
-                "delivery_status": {
-                    "type": "string"
-                },
-                "flight_number": {
-                    "type": "string"
-                },
-                "formation_date": {
+                }
+            }
+        },
+        "model.UserRegisterRequest": {
+            "type": "object",
+            "properties": {
+                "email": {
                     "type": "string"
                 },
                 "full_name": {
                     "type": "string"
-                }
-            }
-        },
-        "model.DeliveryUpdateFlightNumberRequest": {
-            "type": "object",
-            "properties": {
-                "flight_number": {
-                    "type": "string"
-                }
-            }
-        },
-        "model.DeliveryUpdateStatusRequest": {
-            "type": "object",
-            "properties": {
-                "delivery_status": {
+                },
+                "password": {
                     "type": "string"
                 }
             }

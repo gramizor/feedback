@@ -5,7 +5,6 @@ import (
 	"net/http"
 	"strconv"
 
-	"rest-apishka/internal/auth"
 	"rest-apishka/internal/model"
 
 	"github.com/gin-gonic/gin"
@@ -20,13 +19,18 @@ import (
 // @Failure 500 {object} model.GroupsGetResponse "Ошибка сервера"
 // @Router /group [get]
 func (h *Handler) GetGroups(c *gin.Context) {
-	authInstance := auth.GetAuthInstance()
+	ctxUserID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Идентификатор пользователя отсутствует в контексте пп"})
+		return
+	}
+	userID := ctxUserID.(uint)
 	groupCode := c.DefaultQuery("groupCode", "")
 	courseNumber, _ := strconv.Atoi(c.DefaultQuery("courseNumber", "0"))
 	page := c.DefaultQuery("page", "1")
 	pageSize := c.DefaultQuery("pageSize", "10")
 
-	groups, err := h.UseCase.GetGroupsPaged(groupCode, courseNumber, authInstance.UserID, page, pageSize)
+	groups, err := h.UseCase.GetGroupsPaged(groupCode, courseNumber, userID, page, pageSize)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -47,13 +51,18 @@ func (h *Handler) GetGroups(c *gin.Context) {
 // @Failure 500 {object} model.GroupsGetResponse "Внутренняя ошибка сервера"
 // @Router /group/paginate [get]
 func (h *Handler) GetGroupsPaged(c *gin.Context) {
-	authInstance := auth.GetAuthInstance()
+	ctxUserID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Идентификатор пользователя отсутствует в контексте пп"})
+		return
+	}
+	userID := ctxUserID.(uint)
 	groupCode := c.DefaultQuery("groupCode", "")
 	courseNumber, _ := strconv.Atoi(c.DefaultQuery("courseNumber", "0"))
 	page := c.DefaultQuery("page", "1")
 	pageSize := c.DefaultQuery("pageSize", "10")
 
-	groups, err := h.UseCase.GetGroupsPaged(groupCode, courseNumber, authInstance.UserID, page, pageSize)
+	groups, err := h.UseCase.GetGroupsPaged(groupCode, courseNumber, userID, page, pageSize)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -72,7 +81,12 @@ func (h *Handler) GetGroupsPaged(c *gin.Context) {
 // @Failure 500 {object} model.Group "Внутренняя ошибка сервера"
 // @Router /group/{group_id} [get]
 func (h *Handler) GetGroupByID(c *gin.Context) {
-	authInstance := auth.GetAuthInstance()
+	ctxUserID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Идентификатор пользователя отсутствует в контексте пп"})
+		return
+	}
+	userID := ctxUserID.(uint)
 
 	groupID, err := strconv.Atoi(c.Param("group_id"))
 	if err != nil {
@@ -80,7 +94,7 @@ func (h *Handler) GetGroupByID(c *gin.Context) {
 		return
 	}
 
-	group, err := h.UseCase.GetGroupByID(uint(groupID), authInstance.UserID)
+	group, err := h.UseCase.GetGroupByID(uint(groupID), userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -100,7 +114,13 @@ func (h *Handler) GetGroupByID(c *gin.Context) {
 // @Failure 500 {object} model.GroupsGetResponse "Внутренняя ошибка сервера"
 // @Router /group/create [post]
 func (h *Handler) CreateGroup(c *gin.Context) {
-	authInstance := auth.GetAuthInstance()
+	ctxUserID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Идентификатор пользователя отсутствует в контексте пп"})
+		return
+	}
+	userID := ctxUserID.(uint)
+
 	groupCode := c.DefaultQuery("groupCode", "")
 
 	var group model.GroupRequest
@@ -110,13 +130,13 @@ func (h *Handler) CreateGroup(c *gin.Context) {
 		return
 	}
 
-	err := h.UseCase.CreateGroup(authInstance.UserID, group)
+	err := h.UseCase.CreateGroup(userID, group)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	groups, err := h.UseCase.GetGroups(groupCode, authInstance.UserID)
+	groups, err := h.UseCase.GetGroups(groupCode, userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -136,7 +156,12 @@ func (h *Handler) CreateGroup(c *gin.Context) {
 // @Failure 500 {object} model.GroupsGetResponse "Внутренняя ошибка сервера"
 // @Router /group/{group_id}/delete [delete]
 func (h *Handler) DeleteGroup(c *gin.Context) {
-	authInstance := auth.GetAuthInstance()
+	ctxUserID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Идентификатор пользователя отсутствует в контексте пп"})
+		return
+	}
+	userID := ctxUserID.(uint)
 	groupCode := c.DefaultQuery("groupCode", "")
 
 	groupID, err := strconv.Atoi(c.Param("group_id"))
@@ -145,13 +170,13 @@ func (h *Handler) DeleteGroup(c *gin.Context) {
 		return
 	}
 
-	err = h.UseCase.DeleteGroup(uint(groupID), authInstance.UserID)
+	err = h.UseCase.DeleteGroup(uint(groupID), userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	groups, err := h.UseCase.GetGroups(groupCode, authInstance.UserID)
+	groups, err := h.UseCase.GetGroups(groupCode, userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -171,7 +196,12 @@ func (h *Handler) DeleteGroup(c *gin.Context) {
 // @Failure 500 {object} model.Group "Внутренняя ошибка сервера"
 // @Router /group/{group_id}/update [put]
 func (h *Handler) UpdateGroup(c *gin.Context) {
-	authInstance := auth.GetAuthInstance()
+	ctxUserID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Идентификатор пользователя отсутствует в контексте пп"})
+		return
+	}
+	userID := ctxUserID.(uint)
 
 	groupID, err := strconv.Atoi(c.Param("group_id"))
 	if err != nil {
@@ -185,13 +215,13 @@ func (h *Handler) UpdateGroup(c *gin.Context) {
 		return
 	}
 
-	err = h.UseCase.UpdateGroup(uint(groupID), authInstance.UserID, group)
+	err = h.UseCase.UpdateGroup(uint(groupID), userID, group)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	updatedGroup, err := h.UseCase.GetGroupByID(uint(groupID), authInstance.UserID)
+	updatedGroup, err := h.UseCase.GetGroupByID(uint(groupID), userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -211,7 +241,12 @@ func (h *Handler) UpdateGroup(c *gin.Context) {
 // @Failure 500 {object} model.GroupsGetResponse  "Внутренняя ошибка сервера"
 // @Router /group/{group_id}/feedback [post]
 func (h *Handler) AddGroupToFeedback(c *gin.Context) {
-	authInstance := auth.GetAuthInstance()
+	ctxUserID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Идентификатор пользователя отсутствует в контексте пп"})
+		return
+	}
+	userID := ctxUserID.(uint)
 	groupCode := c.DefaultQuery("groupCode", "")
 
 	groupID, err := strconv.Atoi(c.Param("group_id"))
@@ -220,13 +255,13 @@ func (h *Handler) AddGroupToFeedback(c *gin.Context) {
 		return
 	}
 
-	err = h.UseCase.AddGroupToFeedback(uint(groupID), authInstance.UserID, 1)
+	err = h.UseCase.AddGroupToFeedback(uint(groupID), userID, 1)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	groups, err := h.UseCase.GetGroups(groupCode, authInstance.UserID)
+	groups, err := h.UseCase.GetGroups(groupCode, userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -246,7 +281,12 @@ func (h *Handler) AddGroupToFeedback(c *gin.Context) {
 // @Failure 500 {object} model.GroupsGetResponse "Внутренняя ошибка сервера"
 // @Router /groups/{group_id}/feedback [post]
 func (h *Handler) RemoveGroupFromFeedback(c *gin.Context) {
-	authInstance := auth.GetAuthInstance()
+	ctxUserID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Идентификатор пользователя отсутствует в контексте пп"})
+		return
+	}
+	userID := ctxUserID.(uint)
 	groupCode := c.DefaultQuery("groupCode", "")
 
 	groupID, err := strconv.Atoi(c.Param("group_id"))
@@ -255,13 +295,13 @@ func (h *Handler) RemoveGroupFromFeedback(c *gin.Context) {
 		return
 	}
 
-	err = h.UseCase.RemoveGroupFromFeedback(uint(groupID), authInstance.UserID)
+	err = h.UseCase.RemoveGroupFromFeedback(uint(groupID), userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	groups, err := h.UseCase.GetGroups(groupCode, authInstance.UserID)
+	groups, err := h.UseCase.GetGroups(groupCode, userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -283,7 +323,12 @@ func (h *Handler) RemoveGroupFromFeedback(c *gin.Context) {
 // @Failure 500 {object} model.Group "Внутренняя ошибка сервера"
 // @Router /group/{group_id}/image [post]
 func (h *Handler) AddGroupImage(c *gin.Context) {
-	authInstance := auth.GetAuthInstance()
+	ctxUserID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Идентификатор пользователя отсутствует в контексте пп"})
+		return
+	}
+	userID := ctxUserID.(uint)
 
 	groupID, err := strconv.Atoi(c.Param("group_id"))
 	if err != nil {
@@ -312,13 +357,13 @@ func (h *Handler) AddGroupImage(c *gin.Context) {
 
 	contentType := image.Header.Get("Content-Type")
 
-	err = h.UseCase.AddGroupImage(uint(groupID), authInstance.UserID, imageBytes, contentType)
+	err = h.UseCase.AddGroupImage(uint(groupID), userID, imageBytes, contentType)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	group, err := h.UseCase.GetGroupByID(uint(groupID), authInstance.UserID)
+	group, err := h.UseCase.GetGroupByID(uint(groupID), userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
