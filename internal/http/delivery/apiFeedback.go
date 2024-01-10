@@ -4,8 +4,8 @@ import (
 	"net/http"
 	"strconv"
 
-	"rest-apishka/internal/auth"
 	"rest-apishka/internal/model"
+	"rest-apishka/internal/pkg/middleware"
 
 	"github.com/gin-gonic/gin"
 )
@@ -23,7 +23,12 @@ import (
 // @Router /feedback [get]
 
 func (h *Handler) GetFeedbacks(c *gin.Context) {
-	authInstance := auth.GetAuthInstance()
+	ctxUserID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Идентификатор пользователя отсутствует в контексте"})
+		return
+	}
+	userID := ctxUserID.(uint)
 	startFormationDate := c.DefaultQuery("startFormationDate", "")
 	endFormationDate := c.DefaultQuery("endFormationDate", "")
 	feedbackStatus := c.DefaultQuery("feedbackStatus", "")
@@ -31,10 +36,10 @@ func (h *Handler) GetFeedbacks(c *gin.Context) {
 	var feedbacks []model.FeedbackRequest
 	var err error
 
-	if authInstance.Role == "moderator" {
-		feedbacks, err = h.UseCase.GetFeedbacksModerator(startFormationDate, endFormationDate, feedbackStatus, authInstance.UserID)
+	if middleware.ModeratorOnly(h.UseCase.Repository, c) {
+		feedbacks, err = h.UseCase.GetFeedbacksModerator(startFormationDate, endFormationDate, feedbackStatus, userID)
 	} else {
-		feedbacks, err = h.UseCase.GetFeedbacksUser(startFormationDate, endFormationDate, feedbackStatus, authInstance.UserID)
+		feedbacks, err = h.UseCase.GetFeedbacksUser(startFormationDate, endFormationDate, feedbackStatus, userID)
 	}
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -55,7 +60,12 @@ func (h *Handler) GetFeedbacks(c *gin.Context) {
 // @Failure 500 {object} model.FeedbackGetResponse "Ошибка сервера"
 // @Router /feedback/{id} [get]
 func (h *Handler) GetFeedbackByID(c *gin.Context) {
-	authInstance := auth.GetAuthInstance()
+	ctxUserID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Идентификатор пользователя отсутствует в контексте"})
+		return
+	}
+	userID := ctxUserID.(uint)
 	feedbackID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "недопустимый ИД опроса"})
@@ -64,11 +74,11 @@ func (h *Handler) GetFeedbackByID(c *gin.Context) {
 
 	var feedback model.FeedbackGetResponse
 
-	if authInstance.Role == "moderator" {
-		feedback, err = h.UseCase.GetFeedbackByIDModerator(uint(feedbackID), authInstance.UserID)
+	if middleware.ModeratorOnly(h.UseCase.Repository, c) {
+		feedback, err = h.UseCase.GetFeedbackByIDModerator(uint(feedbackID), userID)
 	} else {
 		// Получение опроса для пользователя
-		feedback, err = h.UseCase.GetFeedbackByIDUser(uint(feedbackID), authInstance.UserID)
+		feedback, err = h.UseCase.GetFeedbackByIDUser(uint(feedbackID), userID)
 	}
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
@@ -92,7 +102,13 @@ func (h *Handler) GetFeedbackByID(c *gin.Context) {
 // @Failure 500 {object} model.FeedbackRequest "Ошибка сервера"
 // @Router /feedback/{id}/delete [delete]
 func (h *Handler) DeleteFeedback(c *gin.Context) {
-	authInstance := auth.GetAuthInstance()
+	ctxUserID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Идентификатор пользователя отсутствует в контексте"})
+		return
+	}
+	userID := ctxUserID.(uint)
+
 	startFormationDate := c.DefaultQuery("startFormationDate", "")
 	endFormationDate := c.DefaultQuery("endFormationDate", "")
 	feedbackStatus := c.DefaultQuery("feedbackStatus", "")
@@ -102,18 +118,18 @@ func (h *Handler) DeleteFeedback(c *gin.Context) {
 		return
 	}
 
-	if authInstance.Role == "moderator" {
+	if middleware.ModeratorOnly(h.UseCase.Repository, c) {
 		c.JSON(http.StatusUnauthorized, gin.H{"error": "данный запрос недоступен для модератора"})
 		return
 	}
 
-	err = h.UseCase.DeleteFeedbackUser(uint(feedbackID), authInstance.UserID)
+	err = h.UseCase.DeleteFeedbackUser(uint(feedbackID), userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
 
-	feedbacks, err := h.UseCase.GetFeedbacksUser(startFormationDate, endFormationDate, feedbackStatus, authInstance.UserID)
+	feedbacks, err := h.UseCase.GetFeedbacksUser(startFormationDate, endFormationDate, feedbackStatus, userID)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -128,35 +144,41 @@ func (h *Handler) DeleteFeedback(c *gin.Context) {
 // @Tags Опрос
 // @Produce json
 // @Param id path int true "Идентификатор опроса"
-// @Success 200 {object} model.FeedbackGetResponse "Информация о доставке"
+// @Success 200 {object} model.FeedbackGetResponse "Информация об опросе"
 // @Failure 400 {object} model.FeedbackGetResponse "Недопустимый идентификатор опроса"
 // @Failure 500 {object} model.FeedbackGetResponse "Ошибка сервера"
 // @Router /feedback/{id}/user [put]
 func (h *Handler) UpdateFeedbackStatusUser(c *gin.Context) {
-	authInstance := auth.GetAuthInstance()
+	ctxUserID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Идентификатор пользователя отсутствует в контексте"})
+		return
+	}
+	userID := ctxUserID.(uint)
+
 	feedbackID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{"error": "недоупстимый ИД опроса"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "недоупстимый ИД доставки"})
 		return
 	}
 
-	if authInstance.Role == "user" {
-		err = h.UseCase.UpdateFeedbackStatusUser(uint(feedbackID), authInstance.UserID)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-
-		feedback, err := h.UseCase.GetFeedbackByIDUser(uint(feedbackID), authInstance.UserID)
-		if err != nil {
-			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-			return
-		}
-
-		c.JSON(http.StatusOK, gin.H{"feedback": feedback})
-	} else if authInstance.Role == "moderator" {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "данный запрос доступен только пользователю"})
+	if middleware.ModeratorOnly(h.UseCase.Repository, c) {
+		c.JSON(http.StatusForbidden, gin.H{"error": "данный запрос доступен только пользователю"})
 		return
+	} else {
+		err = h.UseCase.UpdateFeedbackStatusUser(uint(feedbackID), userID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		delivery, err := h.UseCase.GetFeedbackByIDUser(uint(feedbackID), userID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"delivery": delivery})
 	}
 }
 
@@ -167,13 +189,18 @@ func (h *Handler) UpdateFeedbackStatusUser(c *gin.Context) {
 // @Produce json
 // @Param id path int true "Идентификатор опроса"
 // @Param feedbackStatus body model.FeedbackUpdateStatusRequest true "Новый статус опроса"
-// @Success 200 {object} model.FeedbackGetResponse "Информация о доставке"
+// @Success 200 {object} model.FeedbackGetResponse "Информация об опросе"
 // @Failure 400 {object} model.FeedbackGetResponse "Недопустимый идентификатор опроса или ошибка чтения JSON объекта"
 // @Failure 500 {object} model.FeedbackGetResponse "Ошибка сервера"
 // @Router /feedback/{id}/status [put]
 func (h *Handler) UpdateFeedbackStatusModerator(c *gin.Context) {
 	// Получение экземпляра singleton для аутентификации
-	authInstance := auth.GetAuthInstance()
+	ctxUserID, exists := c.Get("userID")
+	if !exists {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": "Идентификатор пользователя отсутствует в контексте"})
+		return
+	}
+	userID := ctxUserID.(uint)
 
 	feedbackID, err := strconv.Atoi(c.Param("id"))
 	if err != nil {
@@ -187,22 +214,22 @@ func (h *Handler) UpdateFeedbackStatusModerator(c *gin.Context) {
 		return
 	}
 
-	if authInstance.Role == "moderator" {
-		err = h.UseCase.UpdateFeedbackStatusModerator(uint(feedbackID), authInstance.UserID, feedbackStatus)
+	if middleware.ModeratorOnly(h.UseCase.Repository, c) {
+		err = h.UseCase.UpdateFeedbackStatusModerator(uint(feedbackID), userID, feedbackStatus)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
 
-		feedback, err := h.UseCase.GetFeedbackByIDUser(uint(feedbackID), authInstance.UserID)
+		delivery, err := h.UseCase.GetFeedbackByIDUser(uint(feedbackID), userID)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{"feedback": feedback})
-	} else if authInstance.Role == "user" {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "данный запрос доступен только модератору"})
+		c.JSON(http.StatusOK, gin.H{"delivery": delivery})
+	} else {
+		c.JSON(http.StatusForbidden, gin.H{"error": "данный запрос доступен только модератору"})
 		return
 	}
 }

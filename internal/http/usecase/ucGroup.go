@@ -2,6 +2,7 @@ package usecase
 
 import (
 	"errors"
+	"strconv"
 	"strings"
 
 	"rest-apishka/internal/model"
@@ -23,6 +24,36 @@ func (uc *UseCase) GetGroups(groupCode string, userID uint) (model.GroupsGetResp
 	}
 
 	return groups, nil
+}
+
+func (uc *UseCase) GetGroupsPaged(groupCode string, courseNumber int, userID uint, page string, pageSize string) (model.GroupsGetResponse, error) {
+	pageNum, err := strconv.Atoi(page)
+	if err != nil {
+		return model.GroupsGetResponse{}, errors.New("некорректное значение страницы")
+	}
+
+	pageSizeNum, err := strconv.Atoi(pageSize)
+	if err != nil {
+		return model.GroupsGetResponse{}, errors.New("некорректное значение размера страницы")
+	}
+
+	if userID <= 0 {
+		return model.GroupsGetResponse{}, errors.New("недопустимый ИД пользователя")
+	}
+
+	groupCode = strings.ToUpper(groupCode + "%")
+
+	groups, err := uc.Repository.GetGroupsPaged(groupCode, courseNumber, userID, pageNum, pageSizeNum)
+	if err != nil {
+		return model.GroupsGetResponse{}, err
+	}
+
+	groupResponse := model.GroupsGetResponse{
+		Groups:     groups.Groups,
+		FeedbackID: groups.FeedbackID,
+	}
+
+	return groupResponse, nil
 }
 
 func (uc *UseCase) GetGroupByID(groupID, userID uint) (model.Group, error) {
