@@ -199,7 +199,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: Информация о доставке
+          description: Информация об опросе
           schema:
             $ref: '#/definitions/model.FeedbackGetResponse'
         "400":
@@ -226,7 +226,7 @@ paths:
       - application/json
       responses:
         "200":
-          description: Информация о доставке
+          description: Информация об опросе
           schema:
             $ref: '#/definitions/model.FeedbackGetResponse'
         "400":

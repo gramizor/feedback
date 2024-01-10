@@ -144,7 +144,7 @@ func (h *Handler) DeleteFeedback(c *gin.Context) {
 // @Tags Опрос
 // @Produce json
 // @Param id path int true "Идентификатор опроса"
-// @Success 200 {object} model.FeedbackGetResponse "Информация о доставке"
+// @Success 200 {object} model.FeedbackGetResponse "Информация об опросе"
 // @Failure 400 {object} model.FeedbackGetResponse "Недопустимый идентификатор опроса"
 // @Failure 500 {object} model.FeedbackGetResponse "Ошибка сервера"
 // @Router /feedback/{id}/user [put]
@@ -189,7 +189,7 @@ func (h *Handler) UpdateFeedbackStatusUser(c *gin.Context) {
 // @Produce json
 // @Param id path int true "Идентификатор опроса"
 // @Param feedbackStatus body model.FeedbackUpdateStatusRequest true "Новый статус опроса"
-// @Success 200 {object} model.FeedbackGetResponse "Информация о доставке"
+// @Success 200 {object} model.FeedbackGetResponse "Информация об опросе"
 // @Failure 400 {object} model.FeedbackGetResponse "Недопустимый идентификатор опроса или ошибка чтения JSON объекта"
 // @Failure 500 {object} model.FeedbackGetResponse "Ошибка сервера"
 // @Router /feedback/{id}/status [put]

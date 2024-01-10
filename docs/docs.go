@@ -148,7 +148,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Информация о доставке",
+                        "description": "Информация об опросе",
                         "schema": {
                             "$ref": "#/definitions/model.FeedbackGetResponse"
                         }
@@ -189,7 +189,7 @@ const docTemplate = `{
                 ],
                 "responses": {
                     "200": {
-                        "description": "Информация о доставке",
+                        "description": "Информация об опросе",
                         "schema": {
                             "$ref": "#/definitions/model.FeedbackGetResponse"
                         }
