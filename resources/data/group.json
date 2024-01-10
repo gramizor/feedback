@@ -1,0 +1,47 @@
+[
+    {
+        "Id": 1,
+        "Name": "РТ5-51Б",
+        "Contacts": "+7(999) 999-99-99",
+        "Course": 3,
+        "Src": "/images/almaz-antey.png",
+        "Href": "/groups/1",
+        "Students": 24
+    },
+    {
+        "Id": 2,
+        "Name": "ИУ5-51Б",
+        "Contacts": "+7(999) 999-88-88",
+        "Course": 3,
+        "Src": "/images/iu5.png",
+        "Href": "/groups/2",
+        "Students": 20
+    },
+    {
+        "Id": 3,
+        "Name": "ИУ5-52Б",
+        "Contacts": "+7(999) 999-77-77",
+        "Course": 3,
+        "Src": "/images/iu5.png",
+        "Href": "/groups/3",
+        "Students": 19
+    },
+    {
+        "Id": 4,
+        "Name": "ИУ5Ц-72Б",
+        "Contacts": "+7(999) 999-66-66",
+        "Course": 4,
+        "Src": "/images/bmstu.png",
+        "Href": "/groups/4",
+        "Students": 3
+    },
+    {
+        "Id": 5,
+        "Name": "ИУ5-55Б",
+        "Contacts": "+7(999) 999-55-55",
+        "Course": 3,
+        "Src": "/images/iu5.png",
+        "Href": "/groups/5",
+        "Students": 19
+    }
+]

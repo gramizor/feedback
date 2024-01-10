@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="ru">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Home</title>
+    <link rel="icon" type="image/x-icon" href="/images/icons8-звезда-96.png">
+    <link rel="stylesheet" type="text/css" href="/css/index.css">
+</head>
+
+<body>
+    <div class="header">
+        <a href="/" class="group-link">Обратная связь по курсу</a>
+        <form action="/search" method="GET" class="form">
+            <input type="text" id="searchQuery" name="groupSearch" class="input" required placeholder="Введите группу"
+                value="{{ .searchQuery }}">
+            <button type="submit" class="button">Искать</button>
+        </form>
+    </div>
+    <div class="description">
+        Этот продукт предназначен для преподавателей с целью сбора обратной связи от студентов, завершивших
+        обучение.</br>Можно проводить опросы и получать ценные замечания, тем самым постоянно совершенствуя
+        свой курс.
+    </div>
+    <div class="group-list">
+        {{ range .groups }}
+        <a href="{{ .Href }}" class="group-link">
+            <div class="group-item">
+                <img src="{{ .Src }}" alt="{{ .Name }}">
+                <h3>{{ .Name }}</h3>
+                <p>Контакты: {{ .Contacts }}</p>
+            </div>
+        </a>
+        {{ end }}
+    </div>
+</body>
+
+</html>
