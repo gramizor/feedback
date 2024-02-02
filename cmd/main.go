@@ -11,7 +11,7 @@ import (
 // @version 1.0
 // @description API server for Feedback application
 
-// @host http://localhost:8081
+// @host http://localhost:8080
 // @BasePath /
 
 // @securityDefinitions.apikey ApiKeyAuth

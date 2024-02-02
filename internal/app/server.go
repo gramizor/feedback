@@ -19,7 +19,7 @@ func (app *Application) Run() {
 	docs.SwaggerInfo.Title = "Feedback RestAPI"
 	docs.SwaggerInfo.Description = "API server for Feedback application"
 	docs.SwaggerInfo.Version = "1.0"
-	docs.SwaggerInfo.Host = "localhost:8081"
+	docs.SwaggerInfo.Host = "localhost:8080"
 	docs.SwaggerInfo.BasePath = "/"
 	r.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	// Группа запросов для группы

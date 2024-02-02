@@ -1,8 +1,13 @@
 {
     "swagger": "2.0",
     "info": {
-        "contact": {}
+        "description": "API server for Feedback application",
+        "title": "Feedback RestAPI",
+        "contact": {},
+        "version": "1.0"
     },
+    "host": "http://localhost:8080",
+    "basePath": "/",
     "paths": {
         "/feedback/{id}": {
             "get": {
@@ -947,6 +952,13 @@
                     "type": "string"
                 }
             }
+        }
+    },
+    "securityDefinitions": {
+        "ApiKeyAuth": {
+            "type": "apiKey",
+            "name": "Authorization",
+            "in": "header"
         }
     }
 }

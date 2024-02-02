@@ -1,3 +1,4 @@
+basePath: /
 definitions:
   model.FeedbackGetResponse:
     properties:
@@ -108,8 +109,12 @@ definitions:
       password:
         type: string
     type: object
+host: http://localhost:8080
 info:
   contact: {}
+  description: API server for Feedback application
+  title: Feedback RestAPI
+  version: "1.0"
 paths:
   /feedback/{id}:
     get:
@@ -627,4 +632,9 @@ paths:
       summary: Регистрация нового пользователя.
       tags:
       - Пользователь
+securityDefinitions:
+  ApiKeyAuth:
+    in: header
+    name: Authorization
+    type: apiKey
 swagger: "2.0"
