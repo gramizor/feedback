@@ -27,13 +27,13 @@ func (app *Application) Run() {
 	{
 		GroupGroup.GET("/", middleware.Guest(app.Repository.GetRedisClient(), []byte("AccessSecretKey"), app.Repository), app.Handler.GetGroups)
 		GroupGroup.GET("/paginate", middleware.Guest(app.Repository.GetRedisClient(), []byte("AccessSecretKey"), app.Repository), app.Handler.GetGroupsPaged)
-		GroupGroup.GET("/:group", middleware.Guest(app.Repository.GetRedisClient(), []byte("AccessSecretKey"), app.Repository), app.Handler.GetGroupByID)
-		GroupGroup.DELETE("/:group/delete", middleware.Authenticate(app.Repository.GetRedisClient(), []byte("AccessSecretKey"), app.Repository), app.Handler.DeleteGroup)
+		GroupGroup.GET("/:group_id", middleware.Guest(app.Repository.GetRedisClient(), []byte("AccessSecretKey"), app.Repository), app.Handler.GetGroupByID)
+		GroupGroup.DELETE("/:group_id", middleware.Authenticate(app.Repository.GetRedisClient(), []byte("AccessSecretKey"), app.Repository), app.Handler.DeleteGroup)
 		GroupGroup.POST("/create", middleware.Authenticate(app.Repository.GetRedisClient(), []byte("AccessSecretKey"), app.Repository), app.Handler.CreateGroup)
-		GroupGroup.PUT("/:group/update", middleware.Authenticate(app.Repository.GetRedisClient(), []byte("AccessSecretKey"), app.Repository), app.Handler.UpdateGroup)
-		GroupGroup.POST("/:group/feedback", middleware.Authenticate(app.Repository.GetRedisClient(), []byte("AccessSecretKey"), app.Repository), app.Handler.AddGroupToFeedback)
-		GroupGroup.DELETE("/:group/feedback/delete", middleware.Authenticate(app.Repository.GetRedisClient(), []byte("AccessSecretKey"), app.Repository), app.Handler.RemoveGroupFromFeedback)
-		GroupGroup.POST("/:group/image", middleware.Authenticate(app.Repository.GetRedisClient(), []byte("AccessSecretKey"), app.Repository), app.Handler.AddGroupImage)
+		GroupGroup.PUT("/:group_id", middleware.Authenticate(app.Repository.GetRedisClient(), []byte("AccessSecretKey"), app.Repository), app.Handler.UpdateGroup)
+		GroupGroup.POST("/:group_id/feedback", middleware.Authenticate(app.Repository.GetRedisClient(), []byte("AccessSecretKey"), app.Repository), app.Handler.AddGroupToFeedback)
+		GroupGroup.DELETE("/:group_id/feedback", middleware.Authenticate(app.Repository.GetRedisClient(), []byte("AccessSecretKey"), app.Repository), app.Handler.RemoveGroupFromFeedback)
+		GroupGroup.POST("/:group_id/image", middleware.Authenticate(app.Repository.GetRedisClient(), []byte("AccessSecretKey"), app.Repository), app.Handler.AddGroupImage)
 	}
 
 	// Группа запросов для опроса
@@ -41,7 +41,7 @@ func (app *Application) Run() {
 	{
 		FeedbackGroup.GET("/", app.Handler.GetFeedbacks)
 		FeedbackGroup.GET("/:id", app.Handler.GetFeedbackByID)
-		FeedbackGroup.DELETE("/:id/delete", app.Handler.DeleteFeedback)
+		FeedbackGroup.DELETE("/:id", app.Handler.DeleteFeedback)
 		FeedbackGroup.PUT("/:id/status/user", app.Handler.UpdateFeedbackStatusUser)           // Новый маршрут для обновления статуса опроса пользователем
 		FeedbackGroup.PUT("/:id/status/moderator", app.Handler.UpdateFeedbackStatusModerator) // Новый маршрут для обновления статуса опроса модератором
 	}
@@ -49,7 +49,7 @@ func (app *Application) Run() {
 	UserGroup := r.Group("/user")
 	{
 		UserGroup.GET("/", app.Handler.GetUserByID)
-		UserGroup.POST("/registration", app.Handler.Register)
+		UserGroup.POST("/register", app.Handler.Register)
 		UserGroup.POST("/login", app.Handler.Login)
 		UserGroup.POST("/logout", middleware.Authenticate(app.Repository.GetRedisClient(), []byte("AccessSecretKey"), app.Repository), app.Handler.Logout)
 	}

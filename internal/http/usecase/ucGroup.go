@@ -12,9 +12,7 @@ type GroupUseCase interface {
 }
 
 func (uc *UseCase) GetGroups(groupCode string, userID uint) (model.GroupsGetResponse, error) {
-	if userID <= 0 {
-		return model.GroupsGetResponse{}, errors.New("недопустимый ИД пользователя")
-	}
+
 
 	groupCode = strings.ToUpper(groupCode + "%")
 
@@ -37,10 +35,6 @@ func (uc *UseCase) GetGroupsPaged(groupCode string, courseNumber int, userID uin
 		return model.GroupsGetResponse{}, errors.New("некорректное значение размера страницы")
 	}
 
-	if userID <= 0 {
-		return model.GroupsGetResponse{}, errors.New("недопустимый ИД пользователя")
-	}
-
 	groupCode = strings.ToUpper(groupCode + "%")
 
 	groups, err := uc.Repository.GetGroupsPaged(groupCode, courseNumber, userID, pageNum, pageSizeNum)
@@ -57,12 +51,6 @@ func (uc *UseCase) GetGroupsPaged(groupCode string, courseNumber int, userID uin
 }
 
 func (uc *UseCase) GetGroupByID(groupID, userID uint) (model.Group, error) {
-	if groupID <= 0 {
-		return model.Group{}, errors.New("недопустимый ИД группы")
-	}
-	if userID <= 0 {
-		return model.Group{}, errors.New("недопустимый ИД пользователя")
-	}
 
 	group, err := uc.Repository.GetGroupByID(groupID, userID)
 	if err != nil {
@@ -73,9 +61,6 @@ func (uc *UseCase) GetGroupByID(groupID, userID uint) (model.Group, error) {
 }
 
 func (uc *UseCase) CreateGroup(userID uint, requestGroup model.GroupRequest) error {
-	if userID <= 0 {
-		return errors.New("недопустимый ИД пользователя")
-	}
 	if requestGroup.GroupCode == "" {
 		return errors.New("название группы должно быть заполнено")
 	}
@@ -109,9 +94,6 @@ func (uc *UseCase) DeleteGroup(groupID, userID uint) error {
 	if groupID <= 0 {
 		return errors.New("недопустимый ИД группы")
 	}
-	if userID <= 0 {
-		return errors.New("недопустимый ИД пользователя")
-	}
 
 	err := uc.Repository.DeleteGroup(groupID, userID)
 	if err != nil {
@@ -129,9 +111,6 @@ func (uc *UseCase) DeleteGroup(groupID, userID uint) error {
 func (uc *UseCase) UpdateGroup(groupID, userID uint, requestGroup model.GroupRequest) error {
 	if groupID <= 0 {
 		return errors.New("недопустимый ИД группы")
-	}
-	if userID <= 0 {
-		return errors.New("недопустимый ИД пользователя")
 	}
 
 	group := model.Group{
@@ -153,9 +132,6 @@ func (uc *UseCase) AddGroupToFeedback(groupID, userID, moderatorID uint) error {
 	if groupID <= 0 {
 		return errors.New("недопустимый ИД группы")
 	}
-	if userID <= 0 {
-		return errors.New("недопустимый ИД пользователя")
-	}
 	if moderatorID <= 0 {
 		return errors.New("недопустимый ИД модератора")
 	}
@@ -172,9 +148,6 @@ func (uc *UseCase) RemoveGroupFromFeedback(groupID, userID uint) error {
 	if groupID <= 0 {
 		return errors.New("недопустимый ИД группы")
 	}
-	if userID <= 0 {
-		return errors.New("недопустимый ИД пользователя")
-	}
 
 	err := uc.Repository.RemoveGroupFromFeedback(groupID, userID)
 	if err != nil {
@@ -187,9 +160,6 @@ func (uc *UseCase) RemoveGroupFromFeedback(groupID, userID uint) error {
 func (uc *UseCase) AddGroupImage(groupID, userID uint, imageBytes []byte, ContentType string) error {
 	if groupID <= 0 {
 		return errors.New("недопустимый ИД группы")
-	}
-	if userID <= 0 {
-		return errors.New("недопустимый ИД пользователя")
 	}
 	if imageBytes == nil {
 		return errors.New("недопустимый imageBytes изображения")

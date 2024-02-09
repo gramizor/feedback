@@ -130,7 +130,7 @@ func (r *Repository) AddGroupToFeedback(groupID, userID, moderatorID uint) error
 			FeedbackStatus: model.FEEDBACK_STATUS_DRAFT,
 			CreationDate:   time.Now(),
 			UserID:         userID,
-			ModeratorID:    moderatorID,
+			// ModeratorID:    moderatorID,
 		}
 
 		if err := r.db.Table("feedbacks").

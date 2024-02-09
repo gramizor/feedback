@@ -59,9 +59,9 @@ func (r *Repository) UpdateFeedbackStatusModerator(feedbackID, moderatorID uint,
 		Error; err != nil {
 		return errors.New("опрос не найден или не принадлежит указанному модератору")
 	}
-
+	currentTime:=time.Now()
 	feedback.FeedbackStatus = feedbackStatus.FeedbackStatus
-	feedback.CompletionDate = time.Now()
+	feedback.CompletionDate = &currentTime
 
 	if err := r.db.Save(&feedback).Error; err != nil {
 		return errors.New("ошибка обновления статуса опроса в БД")

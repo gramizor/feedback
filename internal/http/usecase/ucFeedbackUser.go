@@ -10,10 +10,6 @@ import (
 func (uc *UseCase) GetFeedbacksUser(startFormationDate, endFormationDate, feedbackStatus string, userID uint) ([]model.FeedbackRequest, error) {
 	feedbackStatus = strings.ToLower(feedbackStatus + "%")
 
-	if userID <= 0 {
-		return nil, errors.New("недопустимый ИД пользователя")
-	}
-
 	feedbacks, err := uc.Repository.GetFeedbacksUser(startFormationDate, endFormationDate, feedbackStatus, userID)
 	if err != nil {
 		return nil, err
@@ -25,9 +21,6 @@ func (uc *UseCase) GetFeedbacksUser(startFormationDate, endFormationDate, feedba
 func (uc *UseCase) GetFeedbackByIDUser(feedbackID, userID uint) (model.FeedbackGetResponse, error) {
 	if feedbackID <= 0 {
 		return model.FeedbackGetResponse{}, errors.New("недопустимый ИД опроса")
-	}
-	if userID <= 0 {
-		return model.FeedbackGetResponse{}, errors.New("недопустимый ИД пользователя")
 	}
 
 	feedbacks, err := uc.Repository.GetFeedbackByIDUser(feedbackID, userID)
@@ -42,9 +35,6 @@ func (uc *UseCase) DeleteFeedbackUser(feedbackID, userID uint) error {
 	if feedbackID <= 0 {
 		return errors.New("недопустимый ИД опроса")
 	}
-	if userID <= 0 {
-		return errors.New("недопустимый ИД пользователя")
-	}
 
 	err := uc.Repository.DeleteFeedbackUser(feedbackID, userID)
 	if err != nil {
@@ -57,9 +47,6 @@ func (uc *UseCase) DeleteFeedbackUser(feedbackID, userID uint) error {
 func (uc *UseCase) UpdateFeedbackStatusUser(feedbackID, userID uint) error {
 	if feedbackID <= 0 {
 		return errors.New("недопустимый ИД опроса")
-	}
-	if userID <= 0 {
-		return errors.New("недопустимый ИД пользователя")
 	}
 
 	err := uc.Repository.UpdateFeedbackStatusUser(feedbackID, userID)

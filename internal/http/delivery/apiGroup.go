@@ -36,7 +36,7 @@ func (h *Handler) GetGroups(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"groups": groups})
+	c.JSON(http.StatusOK, gin.H{"groups": groups.Groups, "feedbackID": groups.FeedbackID})
 }
 
 // @Summary Получение списка групп с пагинацией
@@ -68,7 +68,7 @@ func (h *Handler) GetGroupsPaged(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"groups": groups.Groups, "feedback_id": groups.FeedbackID})
+	c.JSON(http.StatusOK, gin.H{"groups": groups.Groups, "feedbackID": groups.FeedbackID})
 }
 
 // @Summary Получение группы по ID
@@ -142,7 +142,7 @@ func (h *Handler) CreateGroup(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"groups": groups})
+	c.JSON(http.StatusOK, gin.H{"groups": groups.Groups, "feedbackID": groups.FeedbackID})
 }
 
 // @Summary Удаление группы
@@ -182,7 +182,7 @@ func (h *Handler) DeleteGroup(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"groups": groups})
+	c.JSON(http.StatusOK, gin.H{"groups": groups.Groups, "feedbackID": groups.FeedbackID})
 }
 
 // @Summary Обновление информации о группе
@@ -267,7 +267,7 @@ func (h *Handler) AddGroupToFeedback(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"groups": groups})
+	c.JSON(http.StatusOK, gin.H{"groups": groups.Groups, "feedbackID": groups.FeedbackID})
 }
 
 // @Summary Удаление группы из опроса
@@ -307,7 +307,7 @@ func (h *Handler) RemoveGroupFromFeedback(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{"groups": groups})
+	c.JSON(http.StatusOK, gin.H{"groups": groups.Groups, "feedbackID": groups.FeedbackID})
 }
 
 // @Summary Добавление изображения к группе

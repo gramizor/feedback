@@ -85,7 +85,7 @@ func (h *Handler) GetFeedbackByID(c *gin.Context) {
 		return
 	}
 
-	c.JSON(http.StatusOK, feedback)
+	c.JSON(http.StatusOK, gin.H{"feedback": feedback})
 }
 
 // DeleteFeedback godoc
@@ -172,13 +172,13 @@ func (h *Handler) UpdateFeedbackStatusUser(c *gin.Context) {
 			return
 		}
 
-		delivery, err := h.UseCase.GetFeedbackByIDUser(uint(feedbackID), userID)
+		feedback, err := h.UseCase.GetFeedbackByIDUser(uint(feedbackID), userID)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{"delivery": delivery})
+		c.JSON(http.StatusOK, gin.H{"feedback": feedback})
 	}
 }
 
@@ -221,13 +221,13 @@ func (h *Handler) UpdateFeedbackStatusModerator(c *gin.Context) {
 			return
 		}
 
-		delivery, err := h.UseCase.GetFeedbackByIDUser(uint(feedbackID), userID)
+		feedback, err := h.UseCase.GetFeedbackByIDUser(uint(feedbackID), userID)
 		if err != nil {
 			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 			return
 		}
 
-		c.JSON(http.StatusOK, gin.H{"delivery": delivery})
+		c.JSON(http.StatusOK, gin.H{"feedback": feedback})
 	} else {
 		c.JSON(http.StatusForbidden, gin.H{"error": "данный запрос доступен только модератору"})
 		return

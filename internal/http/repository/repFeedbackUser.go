@@ -84,8 +84,9 @@ func (r *Repository) UpdateFeedbackStatusUser(feedbackID, userID uint) error {
 		return errors.New("опрос не найден, или не принадлежит указанному преподавателю, или не имеет статус черновика")
 	}
 
+	currentTime := time.Now()
 	feedback.FeedbackStatus = model.FEEDBACK_STATUS_WORK
-	feedback.FormationDate = time.Now()
+	feedback.FormationDate = &currentTime
 
 	if err := r.db.Save(&feedback).Error; err != nil {
 		return errors.New("ошибка обновления статуса опроса в БД")
