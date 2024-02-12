@@ -37,7 +37,7 @@ func (h *Handler) GetFeedbacks(c *gin.Context) {
 	var err error
 
 	if middleware.ModeratorOnly(h.UseCase.Repository, c) {
-		feedbacks, err = h.UseCase.GetFeedbacksModerator(startFormationDate, endFormationDate, feedbackStatus, userID)
+		feedbacks, err = h.UseCase.GetFeedbacksModerator(startFormationDate, endFormationDate, feedbackStatus)
 	} else {
 		feedbacks, err = h.UseCase.GetFeedbacksUser(startFormationDate, endFormationDate, feedbackStatus, userID)
 	}
@@ -75,7 +75,7 @@ func (h *Handler) GetFeedbackByID(c *gin.Context) {
 	var feedback model.FeedbackGetResponse
 
 	if middleware.ModeratorOnly(h.UseCase.Repository, c) {
-		feedback, err = h.UseCase.GetFeedbackByIDModerator(uint(feedbackID), userID)
+		feedback, err = h.UseCase.GetFeedbackByIDModerator(uint(feedbackID))
 	} else {
 		// Получение опроса для пользователя
 		feedback, err = h.UseCase.GetFeedbackByIDUser(uint(feedbackID), userID)
@@ -119,23 +119,35 @@ func (h *Handler) DeleteFeedback(c *gin.Context) {
 	}
 
 	if middleware.ModeratorOnly(h.UseCase.Repository, c) {
-		c.JSON(http.StatusUnauthorized, gin.H{"error": "данный запрос недоступен для модератора"})
-		return
-	}
 
-	err = h.UseCase.DeleteFeedbackUser(uint(feedbackID), userID)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
+		err = h.UseCase.DeleteFeedbackUser(uint(feedbackID), userID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
 
-	feedbacks, err := h.UseCase.GetFeedbacksUser(startFormationDate, endFormationDate, feedbackStatus, userID)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
+		feedbacks, err := h.UseCase.GetFeedbacksModerator(startFormationDate, endFormationDate, feedbackStatus)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
 
-	c.JSON(http.StatusOK, gin.H{"feedbacks": feedbacks})
+		c.JSON(http.StatusOK, gin.H{"feedbacks": feedbacks})
+	} else {
+		err = h.UseCase.DeleteFeedbackUser(uint(feedbackID), userID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		feedbacks, err := h.UseCase.GetFeedbacksUser(startFormationDate, endFormationDate, feedbackStatus, userID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"feedbacks": feedbacks})
+	}
 }
 
 // UpdateFeedbackStatusUser godoc
@@ -163,8 +175,19 @@ func (h *Handler) UpdateFeedbackStatusUser(c *gin.Context) {
 	}
 
 	if middleware.ModeratorOnly(h.UseCase.Repository, c) {
-		c.JSON(http.StatusForbidden, gin.H{"error": "данный запрос доступен только пользователю"})
-		return
+		err = h.UseCase.UpdateFeedbackStatusUser(uint(feedbackID), userID)
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		feedback, err := h.UseCase.GetFeedbackByIDModerator(uint(feedbackID))
+		if err != nil {
+			c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+			return
+		}
+
+		c.JSON(http.StatusOK, gin.H{"feedback": feedback})
 	} else {
 		err = h.UseCase.UpdateFeedbackStatusUser(uint(feedbackID), userID)
 		if err != nil {

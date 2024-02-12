@@ -7,14 +7,10 @@ import (
 	"rest-apishka/internal/model"
 )
 
-func (uc *UseCase) GetFeedbacksModerator(startFormationDate, endFormationDate, feedbackStatus string, moderatorID uint) ([]model.FeedbackRequest, error) {
+func (uc *UseCase) GetFeedbacksModerator(startFormationDate, endFormationDate, feedbackStatus string) ([]model.FeedbackRequest, error) {
 	feedbackStatus = strings.ToLower(feedbackStatus + "%")
 
-	if moderatorID <= 0 {
-		return nil, errors.New("недопустимый ИД модератора")
-	}
-
-	feedbacks, err := uc.Repository.GetFeedbacksModerator(startFormationDate, endFormationDate, feedbackStatus, moderatorID)
+	feedbacks, err := uc.Repository.GetFeedbacksModerator(startFormationDate, endFormationDate, feedbackStatus)
 	if err != nil {
 		return nil, err
 	}
@@ -22,15 +18,12 @@ func (uc *UseCase) GetFeedbacksModerator(startFormationDate, endFormationDate, f
 	return feedbacks, nil
 }
 
-func (uc *UseCase) GetFeedbackByIDModerator(feedbackID, moderatorID uint) (model.FeedbackGetResponse, error) {
+func (uc *UseCase) GetFeedbackByIDModerator(feedbackID uint) (model.FeedbackGetResponse, error) {
 	if feedbackID <= 0 {
 		return model.FeedbackGetResponse{}, errors.New("недопустимый ИД опроса")
 	}
-	if moderatorID <= 0 {
-		return model.FeedbackGetResponse{}, errors.New("недопустимый ИД модератора")
-	}
 
-	feedbacks, err := uc.Repository.GetFeedbackByIDModerator(feedbackID, moderatorID)
+	feedbacks, err := uc.Repository.GetFeedbackByIDModerator(feedbackID)
 	if err != nil {
 		return model.FeedbackGetResponse{}, err
 	}

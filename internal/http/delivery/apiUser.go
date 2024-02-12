@@ -29,7 +29,7 @@ func (h *Handler) Register(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"access_token": loginResponse.AccessToken, "full_name": loginResponse.FullName})
+	c.JSON(http.StatusOK, gin.H{"access_token": loginResponse.AccessToken, "full_name": loginResponse.FullName, "role": loginResponse.Role})
 }
 
 // @BasePath /user/login
@@ -55,7 +55,7 @@ func (h *Handler) Login(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
 	}
-	c.JSON(http.StatusOK, gin.H{"access_token": loginResponse.AccessToken, "full_name": loginResponse.FullName})
+	c.JSON(http.StatusOK, gin.H{"access_token": loginResponse.AccessToken, "full_name": loginResponse.FullName, "role": loginResponse.Role})
 
 }
 

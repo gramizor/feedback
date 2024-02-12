@@ -17,6 +17,8 @@ func (r *Repository) GetFeedbacksUser(startFormationDate, endFormationDate, feed
 		query = query.Where("feedbacks.formation_date BETWEEN ? AND ?", startFormationDate, endFormationDate)
 	}
 
+	query = query.Order("feedbacks.formation_date DESC")
+
 	var feedbacks []model.FeedbackRequest
 	if err := query.Scan(&feedbacks).Error; err != nil {
 		return nil, errors.New("ошибка получения опросов")

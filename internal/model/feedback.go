@@ -19,6 +19,7 @@ type FeedbackRequest struct {
 	CompletionDate *time.Time `json:"completion_date"`
 	FeedbackStatus string     `json:"feedback_status"`
 	FullName       string     `json:"full_name"`
+	ModeratorName  string     `json:"moderator_name"`
 }
 
 type FeedbackGetResponse struct {
