@@ -9,8 +9,10 @@ import (
 
 func (r *Repository) GetFeedbacksUser(startFormationDate, endFormationDate, feedbackStatus string, userID uint) ([]model.FeedbackRequest, error) {
 	query := r.db.Table("feedbacks").
-		Select("DISTINCT feedbacks.feedback_id, feedbacks.creation_date, feedbacks.formation_date, feedbacks.completion_date, feedbacks.feedback_status, users.full_name").
+		Select("DISTINCT feedbacks.feedback_id, feedbacks.creation_date, feedbacks.formation_date, feedbacks.completion_date, feedbacks.feedback_status, creator.full_name, moderator.full_name as moderator_name").
 		Joins("JOIN users ON users.user_id = feedbacks.user_id").
+		Joins("JOIN users creator ON creator.user_id = feedbacks.user_id").
+		Joins("LEFT JOIN users moderator ON moderator.user_id = feedbacks.moderator_id").
 		Where("feedbacks.feedback_status LIKE ? AND feedbacks.user_id = ? AND feedbacks.feedback_status != ?", feedbackStatus, userID, model.FEEDBACK_STATUS_DELETED)
 
 	if startFormationDate != "" && endFormationDate != "" {
