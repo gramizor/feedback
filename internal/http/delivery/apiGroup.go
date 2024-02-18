@@ -18,21 +18,22 @@ import (
 // @Success 200 {object} model.GroupsGetResponse "Список групп"
 // @Failure 500 {object} model.GroupsGetResponse "Ошибка сервера"
 // @Router /group [get]
+
 func (h *Handler) GetGroups(c *gin.Context) {
 	ctxUserID, exists := c.Get("userID")
 	if !exists {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Идентификатор пользователя отсутствует в контексте пп"})
+		c.JSON(http.StatusBadRequest, gin.H{"error": "Идентификатор пользователя отсутствует в контексте"})
 		return
 	}
 	userID := ctxUserID.(uint)
 	groupCode := c.DefaultQuery("groupCode", "")
 	courseNumber, _ := strconv.Atoi(c.DefaultQuery("courseNumber", "0"))
-	page := c.DefaultQuery("page", "1")
-	pageSize := c.DefaultQuery("pageSize", "10")
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "30"))
 
-	groups, err := h.UseCase.GetGroupsPaged(groupCode, courseNumber, userID, page, pageSize)
+	groups, err := h.UseCase.GetGroups(groupCode, courseNumber, userID, page, pageSize)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
 
@@ -50,26 +51,27 @@ func (h *Handler) GetGroups(c *gin.Context) {
 // @Failure 400 {object} model.GroupsGetResponse "Некорректный запрос"
 // @Failure 500 {object} model.GroupsGetResponse "Внутренняя ошибка сервера"
 // @Router /group/paginate [get]
-func (h *Handler) GetGroupsPaged(c *gin.Context) {
-	ctxUserID, exists := c.Get("userID")
-	if !exists {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": "Идентификатор пользователя отсутствует в контексте пп"})
-		return
-	}
-	userID := ctxUserID.(uint)
-	groupCode := c.DefaultQuery("groupCode", "")
-	courseNumber, _ := strconv.Atoi(c.DefaultQuery("courseNumber", "0"))
-	page := c.DefaultQuery("page", "1")
-	pageSize := c.DefaultQuery("pageSize", "10")
 
-	groups, err := h.UseCase.GetGroupsPaged(groupCode, courseNumber, userID, page, pageSize)
-	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
-		return
-	}
+// func (h *Handler) GetGroupsPaged(c *gin.Context) {
+// 	ctxUserID, exists := c.Get("userID")
+// 	if !exists {
+// 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Идентификатор пользователя отсутствует в контексте пп"})
+// 		return
+// 	}
+// 	userID := ctxUserID.(uint)
+// 	groupCode := c.DefaultQuery("groupCode", "")
+// 	courseNumber, _ := strconv.Atoi(c.DefaultQuery("courseNumber", "0"))
+// 	page := c.DefaultQuery("page", "1")
+// 	pageSize := c.DefaultQuery("pageSize", "10")
 
-	c.JSON(http.StatusOK, gin.H{"groups": groups.Groups, "feedbackID": groups.FeedbackID})
-}
+// 	groups, err := h.UseCase.GetGroupsPaged(groupCode, courseNumber, userID, page, pageSize)
+// 	if err != nil {
+// 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+// 		return
+// 	}
+
+// 	c.JSON(http.StatusOK, gin.H{"groups": groups.Groups, "feedbackID": groups.FeedbackID})
+// }
 
 // @Summary Получение группы по ID
 // @Description Возвращает информацию о группе по его ID
@@ -120,8 +122,10 @@ func (h *Handler) CreateGroup(c *gin.Context) {
 		return
 	}
 	userID := ctxUserID.(uint)
-
 	groupCode := c.DefaultQuery("groupCode", "")
+	courseNumber, _ := strconv.Atoi(c.DefaultQuery("courseNumber", "0"))
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "30"))
 
 	var group model.GroupRequest
 
@@ -136,7 +140,7 @@ func (h *Handler) CreateGroup(c *gin.Context) {
 		return
 	}
 
-	groups, err := h.UseCase.GetGroups(groupCode, userID)
+	groups, err := h.UseCase.GetGroups(groupCode, courseNumber, userID, page, pageSize)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -161,8 +165,12 @@ func (h *Handler) DeleteGroup(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Идентификатор пользователя отсутствует в контексте пп"})
 		return
 	}
+
 	userID := ctxUserID.(uint)
 	groupCode := c.DefaultQuery("groupCode", "")
+	courseNumber, _ := strconv.Atoi(c.DefaultQuery("courseNumber", "0"))
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "30"))
 
 	groupID, err := strconv.Atoi(c.Param("group_id"))
 	if err != nil {
@@ -176,7 +184,7 @@ func (h *Handler) DeleteGroup(c *gin.Context) {
 		return
 	}
 
-	groups, err := h.UseCase.GetGroups(groupCode, userID)
+	groups, err := h.UseCase.GetGroups(groupCode, courseNumber, userID, page, pageSize)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -246,10 +254,14 @@ func (h *Handler) AddGroupToFeedback(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Идентификатор пользователя отсутствует в контексте пп"})
 		return
 	}
+
 	userID := ctxUserID.(uint)
 	groupCode := c.DefaultQuery("groupCode", "")
-
+	courseNumber, _ := strconv.Atoi(c.DefaultQuery("courseNumber", "0"))
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "30"))
 	groupID, err := strconv.Atoi(c.Param("group_id"))
+
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": "недопустимый ИД группы"})
 		return
@@ -261,7 +273,7 @@ func (h *Handler) AddGroupToFeedback(c *gin.Context) {
 		return
 	}
 
-	groups, err := h.UseCase.GetGroups(groupCode, userID)
+	groups, err := h.UseCase.GetGroups(groupCode, courseNumber, userID, page, pageSize)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return
@@ -286,8 +298,12 @@ func (h *Handler) RemoveGroupFromFeedback(c *gin.Context) {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": "Идентификатор пользователя отсутствует в контексте пп"})
 		return
 	}
+
 	userID := ctxUserID.(uint)
 	groupCode := c.DefaultQuery("groupCode", "")
+	courseNumber, _ := strconv.Atoi(c.DefaultQuery("courseNumber", "0"))
+	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "30"))
 
 	groupID, err := strconv.Atoi(c.Param("group_id"))
 	if err != nil {
@@ -301,7 +317,7 @@ func (h *Handler) RemoveGroupFromFeedback(c *gin.Context) {
 		return
 	}
 
-	groups, err := h.UseCase.GetGroups(groupCode, userID)
+	groups, err := h.UseCase.GetGroups(groupCode, courseNumber, userID, page, pageSize)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

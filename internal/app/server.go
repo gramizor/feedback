@@ -26,7 +26,6 @@ func (app *Application) Run() {
 	GroupGroup := r.Group("/group")
 	{
 		GroupGroup.GET("/", middleware.Guest(app.Repository.GetRedisClient(), []byte("AccessSecretKey"), app.Repository), app.Handler.GetGroups)
-		GroupGroup.GET("/paginate", middleware.Guest(app.Repository.GetRedisClient(), []byte("AccessSecretKey"), app.Repository), app.Handler.GetGroupsPaged)
 		GroupGroup.GET("/:group_id", middleware.Guest(app.Repository.GetRedisClient(), []byte("AccessSecretKey"), app.Repository), app.Handler.GetGroupByID)
 		GroupGroup.DELETE("/:group_id", middleware.Authenticate(app.Repository.GetRedisClient(), []byte("AccessSecretKey"), app.Repository), app.Handler.DeleteGroup)
 		GroupGroup.POST("/", middleware.Authenticate(app.Repository.GetRedisClient(), []byte("AccessSecretKey"), app.Repository), app.Handler.CreateGroup)

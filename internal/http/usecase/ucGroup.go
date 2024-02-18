@@ -2,7 +2,6 @@ package usecase
 
 import (
 	"errors"
-	"strconv"
 	"strings"
 
 	"rest-apishka/internal/model"
@@ -11,12 +10,14 @@ import (
 type GroupUseCase interface {
 }
 
-func (uc *UseCase) GetGroups(groupCode string, userID uint) (model.GroupsGetResponse, error) {
-
+func (uc *UseCase) GetGroups(groupCode string, courseNumber int, userID uint, page, pageSize int) (model.GroupsGetResponse, error) {
+	if userID < 0 {
+		return model.GroupsGetResponse{}, errors.New("недопустимый ИД пользователя")
+	}
 
 	groupCode = strings.ToUpper(groupCode + "%")
 
-	groups, err := uc.Repository.GetGroups(groupCode, userID)
+	groups, err := uc.Repository.GetGroups(groupCode, courseNumber, userID, page, pageSize)
 	if err != nil {
 		return model.GroupsGetResponse{}, err
 	}
@@ -24,31 +25,31 @@ func (uc *UseCase) GetGroups(groupCode string, userID uint) (model.GroupsGetResp
 	return groups, nil
 }
 
-func (uc *UseCase) GetGroupsPaged(groupCode string, courseNumber int, userID uint, page string, pageSize string) (model.GroupsGetResponse, error) {
-	pageNum, err := strconv.Atoi(page)
-	if err != nil {
-		return model.GroupsGetResponse{}, errors.New("некорректное значение страницы")
-	}
+// func (uc *UseCase) GetGroupsPaged(groupCode string, courseNumber int, userID uint, page string, pageSize string) (model.GroupsGetResponse, error) {
+// 	pageNum, err := strconv.Atoi(page)
+// 	if err != nil {
+// 		return model.GroupsGetResponse{}, errors.New("некорректное значение страницы")
+// 	}
 
-	pageSizeNum, err := strconv.Atoi(pageSize)
-	if err != nil {
-		return model.GroupsGetResponse{}, errors.New("некорректное значение размера страницы")
-	}
+// 	pageSizeNum, err := strconv.Atoi(pageSize)
+// 	if err != nil {
+// 		return model.GroupsGetResponse{}, errors.New("некорректное значение размера страницы")
+// 	}
 
-	groupCode = strings.ToUpper(groupCode + "%")
+// 	groupCode = strings.ToUpper(groupCode + "%")
 
-	groups, err := uc.Repository.GetGroupsPaged(groupCode, courseNumber, userID, pageNum, pageSizeNum)
-	if err != nil {
-		return model.GroupsGetResponse{}, err
-	}
+// 	groups, err := uc.Repository.GetGroupsPaged(groupCode, courseNumber, userID, pageNum, pageSizeNum)
+// 	if err != nil {
+// 		return model.GroupsGetResponse{}, err
+// 	}
 
-	groupResponse := model.GroupsGetResponse{
-		Groups:     groups.Groups,
-		FeedbackID: groups.FeedbackID,
-	}
+// 	groupResponse := model.GroupsGetResponse{
+// 		Groups:     groups.Groups,
+// 		FeedbackID: groups.FeedbackID,
+// 	}
 
-	return groupResponse, nil
-}
+// 	return groupResponse, nil
+// }
 
 func (uc *UseCase) GetGroupByID(groupID, userID uint) (model.Group, error) {
 

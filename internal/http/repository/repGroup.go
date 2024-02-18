@@ -11,60 +11,66 @@ type GroupRepository interface {
 	GetGroups(groupCode string, userID uint) (model.GroupsGetResponse, error)
 }
 
-func (r *Repository) GetGroups(groupCode string, userID uint) (model.GroupsGetResponse, error) {
-	var feedbackID uint
-	if err := r.db.
-		Table("feedbacks").
-		Select("feedbacks.feedback_id").
+func (r *Repository) GetGroups(groupCode string, courseNumber int, userID uint, page, pageSize int) (model.GroupsGetResponse, error) {
+	var feedback model.Feedback
+	if err := r.db.Table("feedbacks").
 		Where("user_id = ? AND feedback_status = ?", userID, model.FEEDBACK_STATUS_DRAFT).
-		Take(&feedbackID).Error; err != nil {
+		Take(&feedback).Error; err != nil {
 	}
 
 	var groups []model.Group
-	if err := r.db.Table("groups").
-		Where("groups.group_status = ? AND groups.group_code LIKE ?", model.GROUP_STATUS_ACTIVE, groupCode).
-		Scan(&groups).Error; err != nil {
-		return model.GroupsGetResponse{}, errors.New("ошибка нахождения группы")
-	}
+	offset := (page - 1) * pageSize
 
-	groupResponse := model.GroupsGetResponse{
-		Groups:     groups,
-		FeedbackID: feedbackID,
-	}
-
-	return groupResponse, nil
-}
-
-func (r *Repository) GetGroupsPaged(groupCode string, courseNumber int, userID uint, page int, pageSize int) (model.GroupsGetResponse, error) {
-	var feedbackID uint
-	if err := r.db.
-		Table("feedbacks").
-		Select("feedbacks.feedback_id").
-		Where("user_id = ? AND feedback_status = ?", userID, model.FEEDBACK_STATUS_DRAFT).
-		Take(&feedbackID).Error; err != nil {
-		// Обработка ошибки, если нужно
-	}
-
-	var groups []model.Group
 	query := r.db.Table("groups").
-		Where("groups.group_status = ? AND groups.group_code LIKE ?", model.GROUP_STATUS_ACTIVE, groupCode)
-
+		Where("group_status = ? AND group_code LIKE ?", model.GROUP_STATUS_ACTIVE, groupCode).
+		Limit(pageSize).Offset(offset)
 	if courseNumber > 0 {
 		// Добавим условие для поиска по номеру курса
 		query = query.Where("groups.course = ?", courseNumber)
 	}
 
-	if err := query.Offset((page - 1) * pageSize).Limit(pageSize).Scan(&groups).Error; err != nil {
-		return model.GroupsGetResponse{}, errors.New("ошибка нахождения группы")
+	if err := query.Find(&groups).Error; err != nil {
+		return model.GroupsGetResponse{}, err
 	}
 
 	groupResponse := model.GroupsGetResponse{
 		Groups:     groups,
-		FeedbackID: feedbackID,
+		FeedbackID: feedback.FeedbackID,
 	}
 
 	return groupResponse, nil
 }
+
+// func (r *Repository) GetGroupsPaged(groupCode string, courseNumber int, userID uint, page int, pageSize int) (model.GroupsGetResponse, error) {
+// 	var feedbackID uint
+// 	if err := r.db.
+// 		Table("feedbacks").
+// 		Select("feedbacks.feedback_id").
+// 		Where("user_id = ? AND feedback_status = ?", userID, model.FEEDBACK_STATUS_DRAFT).
+// 		Take(&feedbackID).Error; err != nil {
+// 		// Обработка ошибки, если нужно
+// 	}
+
+// 	var groups []model.Group
+// 	query := r.db.Table("groups").
+// 		Where("groups.group_status = ? AND groups.group_code LIKE ?", model.GROUP_STATUS_ACTIVE, groupCode)
+
+// 	if courseNumber > 0 {
+// 		// Добавим условие для поиска по номеру курса
+// 		query = query.Where("groups.course = ?", courseNumber)
+// 	}
+
+// 	if err := query.Offset((page - 1) * pageSize).Limit(pageSize).Scan(&groups).Error; err != nil {
+// 		return model.GroupsGetResponse{}, errors.New("ошибка нахождения группы")
+// 	}
+
+// 	groupResponse := model.GroupsGetResponse{
+// 		Groups:     groups,
+// 		FeedbackID: feedbackID,
+// 	}
+
+// 	return groupResponse, nil
+// }
 
 func (r *Repository) GetGroupByID(groupID, userID uint) (model.Group, error) {
 	var group model.Group
