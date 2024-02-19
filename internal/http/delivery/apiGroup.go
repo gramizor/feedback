@@ -29,7 +29,7 @@ func (h *Handler) GetGroups(c *gin.Context) {
 	groupCode := c.DefaultQuery("groupCode", "")
 	courseNumber, _ := strconv.Atoi(c.DefaultQuery("courseNumber", "0"))
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
-	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "30"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "10"))
 
 	groups, err := h.UseCase.GetGroups(groupCode, courseNumber, userID, page, pageSize)
 	if err != nil {
@@ -125,7 +125,7 @@ func (h *Handler) CreateGroup(c *gin.Context) {
 	groupCode := c.DefaultQuery("groupCode", "")
 	courseNumber, _ := strconv.Atoi(c.DefaultQuery("courseNumber", "0"))
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
-	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "30"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "10"))
 
 	var group model.GroupRequest
 
@@ -170,7 +170,7 @@ func (h *Handler) DeleteGroup(c *gin.Context) {
 	groupCode := c.DefaultQuery("groupCode", "")
 	courseNumber, _ := strconv.Atoi(c.DefaultQuery("courseNumber", "0"))
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
-	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "30"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "10"))
 
 	groupID, err := strconv.Atoi(c.Param("group_id"))
 	if err != nil {
@@ -259,7 +259,7 @@ func (h *Handler) AddGroupToFeedback(c *gin.Context) {
 	groupCode := c.DefaultQuery("groupCode", "")
 	courseNumber, _ := strconv.Atoi(c.DefaultQuery("courseNumber", "0"))
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
-	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "30"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "10"))
 	groupID, err := strconv.Atoi(c.Param("group_id"))
 
 	if err != nil {
@@ -303,7 +303,7 @@ func (h *Handler) RemoveGroupFromFeedback(c *gin.Context) {
 	groupCode := c.DefaultQuery("groupCode", "")
 	courseNumber, _ := strconv.Atoi(c.DefaultQuery("courseNumber", "0"))
 	page, _ := strconv.Atoi(c.DefaultQuery("page", "1"))
-	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "30"))
+	pageSize, _ := strconv.Atoi(c.DefaultQuery("pageSize", "10"))
 
 	groupID, err := strconv.Atoi(c.Param("group_id"))
 	if err != nil {
